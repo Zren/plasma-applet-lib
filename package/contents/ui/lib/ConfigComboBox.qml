@@ -1,11 +1,8 @@
+// Version 2
+
 import QtQuick 2.0
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.0
-
-import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.components 2.0 as PlasmaComponents
-
-import ".."
 
 /*
 ** Example:
@@ -13,77 +10,101 @@ import ".."
 ConfigComboBox {
 	configKey: "appDescription"
 	model: [
-		{ value: "hidden", text: i18n("Hidden") },
-		{ value: "after", text: i18n("After") },
-		{ value: "below", text: i18n("Below") },
+		{ value: "a", text: i18n("A") },
+		{ value: "b", text: i18n("B") },
+		{ value: "c", text: i18n("C") },
 	]
 }
 */
 RowLayout {
 	id: configComboBox
-	spacing: 2
-	// Layout.fillWidth: true
-	Layout.maximumWidth: 300
-
-	property alias label: label.text
-	property alias horizontalAlignment: label.horizontalAlignment
 
 	property string configKey: ''
-	readonly property string value: configKey ? plasmoid.configuration[configKey] : ""
-	onValueChanged: comboBox.selectValue(value)
-	function setValue(val) { comboBox.selectValue(val) }
+	readonly property var currentItem: comboBox.model[comboBox.currentIndex]
+	readonly property string value: currentItem ? currentItem.value : ""
+	readonly property string configValue: configKey ? plasmoid.configuration[configKey] : ""
+	onConfigValueChanged: {
+		if (!comboBox.focus && value != configValue) {
+			setValue(configValue)
+		}
+	}
 
+	property alias textRole: comboBox.textRole
 	property alias model: comboBox.model
 
+	property alias before: labelBefore.text
+	property alias after: labelAfter.text
+
 	signal populate()
-	Component.onCompleted: populate()
+	property bool populated: false
+
+	function setValue(newValue) {
+		for (var i = 0; i < comboBox.model.length; i++) {
+			if (comboBox.model[i].value == newValue) {
+				comboBox.currentIndex = i
+				break
+			}
+		}
+	}
 
 	Label {
-		id: label
-		text: "Label"
-		Layout.fillWidth: horizontalAlignment == Text.AlignRight
-		horizontalAlignment: Text.AlignLeft
+		id: labelBefore
+		text: ""
+		visible: text
 	}
 
 	ComboBox {
 		id: comboBox
-		Layout.fillWidth: label.horizontalAlignment == Text.AlignLeft
+		textRole: "text" // Doesn't autodeduce from model if we manually populate it
+
+		model: []
+
+		Component.onCompleted: {
+			populate()
+			selectValue(configValue)
+		}
 
 		onCurrentIndexChanged: {
 			if (currentIndex >= 0 && typeof model !== 'number') {
 				var val = model[currentIndex].value
-				if (configKey && val) {
+				if (configKey && val && populated) {
 					plasmoid.configuration[configKey] = val
 				}
 			}
 		}
+	}
 
-		function size() {
-			if (typeof model === "number") {
-				return model
-			} else if (typeof model.count === "number") {
-				return model.count
-			} else if (typeof model.length === "number") {
-				return model.length
-			} else {
-				return 0
+	Label {
+		id: labelAfter
+		text: ""
+		visible: text
+	}
+
+	function size() {
+		if (typeof model === "number") {
+			return model
+		} else if (typeof model.count === "number") {
+			return model.count
+		} else if (typeof model.length === "number") {
+			return model.length
+		} else {
+			return 0
+		}
+	}
+
+	function findValue(val) {
+		for (var i = 0; i < size(); i++) {
+			if (model[i].value == val) {
+				return i
 			}
 		}
+		return -1
+	}
 
-		function findValue(val) {
-			for (var i = 0; i < size(); i++) {
-				if (model[i].value == val) {
-					return i
-				}
-			}
-			return -1
-		}
-
-		function selectValue(val) {
-			var index = comboBox.findValue(val)
-			if (index >= 0) {
-				comboBox.currentIndex = index
-			}
+	function selectValue(val) {
+		var index = findValue(val)
+		if (index >= 0) {
+			comboBox.currentIndex = index
 		}
 	}
 }
