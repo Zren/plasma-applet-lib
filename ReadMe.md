@@ -2,6 +2,10 @@
 
 This is a folder of various reuseable files for developing a Plasma Widget.
 
+I recommend [downloading the zip](https://github.com/Zren/plasma-applet-lib/archive/master.zip) over cloning this repo, as you might not need everything in this project. It will also give your repo a clean git histroy.
+
+## Library Contents
+
 * `sh ./reinstall` to install the widget and restart `plasmashell` to test your widget in the panel.
 * `sh ./build` to generate a zip file with the extension `.plasmoid` which you can upload to the [KDE Store](https://store.kde.org).
 * `project.sublime-project` Normally you shouldn't commit your IDE project files, but I did so to give you an example of my various build commands.
@@ -36,3 +40,4 @@ This is a folder of various reuseable files for developing a Plasma Widget.
 			* `ConfigSpinBox.qml` is used for Integers and Doubles (real numbers).
 			* `ConfigStringList.qml` displays a list of strings in a [TextArea](https://doc.qt.io/qt-5/qml-qtquick-controls-textarea.html) which each line is an item.
 * `Changelog.md` is for listing your new features for users. The KDE Store has a changelog feature which you can paste your feature lists into.
+* `mv ReadMe-widget.md ReadMe.md` you should always have a ReadMe for your project, overwrite this library readme with the one designed for your widget.
