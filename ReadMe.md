@@ -25,7 +25,7 @@ I recommend [downloading the zip](https://github.com/Zren/plasma-applet-lib/arch
 		* `ConfigPage.qml` and `AppletVersion.qml` are used as the root item in a widget config tab. It's basically a fancy [`ColumnLayout`](https://doc.qt.io/qt-5/qml-qtquick-layouts-columnlayout.html) that displays the widget version that is in `metadata.desktop`.
 		* `ConfigAdvanced.qml` reads `config/main.xml` to know all config values and their default values. It displays every config value and you can even modify a number of data types. It's useful for easily observing hidden config variables without setting up controls in the config page.
 		* `ConfigSection.qml` is designed to work like a [`GroupBox`](https://doc.qt.io/qt-5/qml-qtquick-controls-groupbox.html) but guarantees the title is left aligned, rather than using the Breeze Qt widget theme which has titles center aligned.
-		* Various form controls for editing config values. They are designed so the user does **not** need to click Apply. You can easily add a control with `ConfigColor { configKey: 'textColor' }`.
+		* Various form controls for editing config values. They are designed so the user does **not** need to click Apply. You can easily add a control with `ConfigColor { configKey: "textColor" }`.
 			* `ConfigColor.qml`
 			* `ConfigComboBox.qml` You will need to populate the dropdown with:  
 			  ```
