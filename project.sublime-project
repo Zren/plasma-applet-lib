@@ -1,0 +1,77 @@
+{
+	"build_systems": [
+		{
+			"name": "Project",
+			"shell_cmd": "QML_DISABLE_DISK_CACHE=true konsole --hold -e \"plasmoidviewer -a package -l topedge -f horizontal -x 0 -y 0\"",
+			"working_dir": "${project_path}/",
+			"variants": [
+				{
+					"name": "Run (2x DPI)",
+					"shell_cmd": "QT_DEVICE_PIXEL_RATIO=2 QML_DISABLE_DISK_CACHE=true konsole --hold -e \"plasmoidviewer -a package -l topedge -f horizontal -x 0 -y 0 -s 1920x1080\""
+				},
+				{
+					"name": "Reinstall",
+					"shell_cmd": "konsole --hold -e \"sh ./reinstall\""
+				},
+				{
+					"name": "Build",
+					"shell_cmd": "konsole --hold -e \"sh ./build\""
+				},
+				{
+					"name": "Run (LocaleTest: bg)",
+					"shell_cmd": "TZ='Europe/Sofia' sh ./package/translate/plasmoidlocaletest bg"
+				},
+				{
+					"name": "Run (LocaleTest: el)",
+					"shell_cmd": "sh ./package/translate/plasmoidlocaletest el"
+				},
+				{
+					"name": "Run (LocaleTest: es)",
+					"shell_cmd": "sh ./package/translate/plasmoidlocaletest es"
+				},
+				{
+					"name": "Run (LocaleTest: fr)",
+					"shell_cmd": "sh ./package/translate/plasmoidlocaletest fr"
+				},
+				{
+					"name": "Run (LocaleTest: nl)",
+					"shell_cmd": "sh ./package/translate/plasmoidlocaletest nl"
+				},
+				{
+					"name": "Run (LocaleTest: pl)",
+					"shell_cmd": "sh ./package/translate/plasmoidlocaletest pl"
+				},
+				{
+					"name": "Run (LocaleTest: ru)",
+					"shell_cmd": "sh ./package/translate/plasmoidlocaletest ru"
+				},
+				{
+					"name": "Run (LocaleTest: pt)",
+					"shell_cmd": "sh ./package/translate/plasmoidlocaletest pt"
+				},
+				{
+					"name": "Run (LocaleTest: tr)",
+					"shell_cmd": "sh ./package/translate/plasmoidlocaletest tr"
+				},
+				{
+					"name": "Run (LocaleTest: uk)",
+					"shell_cmd": "sh ./package/translate/plasmoidlocaletest uk"
+				},
+				{
+					"name": "Run (LocaleTest: zh_CN)",
+					"shell_cmd": "sh ./package/translate/plasmoidlocaletest zh"
+				},
+				{
+					"name": "Run (Memory Test)",
+					"shell_cmd": "QML_DISABLE_DISK_CACHE=true valgrind --tool=massif --time-unit=ms plasmoidviewer -a package -l topedge -f horizontal -x 0 -y 0; massif-visualizer"
+				}
+			]
+		}
+	],
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	]
+}

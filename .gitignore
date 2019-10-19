@@ -1,0 +1,7 @@
+*.plasmoid
+*.qmlc
+*.jsc
+*.mo
+
+*.sublime-project
+*.sublime-workspace
