@@ -35,4 +35,4 @@ This is a folder of various reuseable files for developing a Plasma Widget.
 			* `ConfigIcon.qml` is similar to the App Menu's icon selector, but also contains a [TextField](https://doc.qt.io/qt-5/qml-qtquick-controls-textfield.html).
 			* `ConfigSpinBox.qml` is used for Integers and Doubles (real numbers).
 			* `ConfigStringList.qml` displays a list of strings in a [TextArea](https://doc.qt.io/qt-5/qml-qtquick-controls-textarea.html) which each line is an item.
-	
+* `Changelog.md` is for listing your new features for users. The KDE Store has a changelog feature which you can paste your feature lists into.
