@@ -28,14 +28,16 @@ I recommend [downloading the zip](https://github.com/Zren/plasma-applet-lib/arch
 		* Various form controls for editing config values. They are designed so the user does **not** need to click Apply. You can easily add a control with `ConfigColor { configKey: 'textColor' }`.
 			* `ConfigColor.qml`
 			* `ConfigComboBox.qml` You will need to populate the dropdown with:  
-					ConfigComboBox {
-						configKey: "appDescription"
-						model: [
-							{ value: "a", text: i18n("A") },
-							{ value: "b", text: i18n("B") },
-							{ value: "c", text: i18n("C") },
-						]
-					}
+				```
+				ConfigComboBox {
+					configKey: "appDescription"
+					model: [
+						{ value: "a", text: i18n("A") },
+						{ value: "b", text: i18n("B") },
+						{ value: "c", text: i18n("C") },
+					]
+				}
+				```
 			* `ConfigIcon.qml` is similar to the App Menu's icon selector, but also contains a [TextField](https://doc.qt.io/qt-5/qml-qtquick-controls-textfield.html).
 			* `ConfigSpinBox.qml` is used for Integers and Doubles (real numbers).
 			* `ConfigStringList.qml` displays a list of strings in a [TextArea](https://doc.qt.io/qt-5/qml-qtquick-controls-textarea.html) which each line is an item.
