@@ -8,7 +8,7 @@ RowLayout {
 	id: configSpinBox
 
 	property string configKey: ''
-	readonly property var configValue: plasmoid.configuration[configKey]
+	readonly property var configValue: configKey ? plasmoid.configuration[configKey] : 0
 	property alias decimals: spinBox.decimals
 	property alias horizontalAlignment: spinBox.horizontalAlignment
 	property alias maximumValue: spinBox.maximumValue
