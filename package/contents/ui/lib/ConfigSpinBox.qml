@@ -1,4 +1,4 @@
-// Version 2
+// Version 3
 
 import QtQuick 2.0
 import QtQuick.Controls 1.0
@@ -44,6 +44,10 @@ RowLayout {
 	Timer { // throttle
 		id: serializeTimer
 		interval: 300
-		onTriggered: plasmoid.configuration[configKey] = value
+		onTriggered: {
+			if (configKey) {
+				plasmoid.configuration[configKey] = value
+			}
+		}
 	}
 }
