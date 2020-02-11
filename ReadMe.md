@@ -14,7 +14,7 @@ I recommend [downloading the zip](https://github.com/Zren/plasma-applet-lib/arch
 		* `2x dpi` to test if your widget properly scales for HiDPI monitors.
 		* `locale de` to test the German locale using `.../translate/plasmoidlocaletest`.
 		* `reinstall` to install the widget and restart `plasmashell` to test your widget in the panel.
-* `package/translate/` contains various scripts for tranlating a widget.
+* `package/translate/` contains various scripts for translating a widget.
 	* `sh ./merge` will find all `i18n("Messages")` in your widget, then generate a `template.pot` for you. You can then copy and raname the template file to `fr.po` to translate the `msgstr ""` in order to translate your widget into French. If you run `sh ./merge` again, it will also merge new messages added to the widget into `template.pot` and `fr.po`.
 	* `sh ./build` will convert the `fr.po` files into the smaller binary `fr.mo` files. It places those in `package/contents/locale` which is where they need to be for Plasma to recognize the translations.
 	* `sh ./plasmoidlocaletest` will run the `./build` script, then run `plasmoidviewer` with `LANGUAGE="fr_CA:fr"`, `LANG="fr_CA.UTF-8"`, and `LC_TIME="fr_CA.UTF-8"` so you can test the translations.
