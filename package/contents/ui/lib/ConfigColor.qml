@@ -1,4 +1,4 @@
-// Version 2
+// Version 3
 
 import QtQuick 2.0
 import QtQuick.Controls 1.0
@@ -18,7 +18,19 @@ RowLayout {
 	Layout.maximumWidth: 300 * units.devicePixelRatio
 
 	property alias label: label.text
+	property alias labelColor: label.color
 	property alias horizontalAlignment: label.horizontalAlignment
+	property alias showAlphaChannel: dialog.showAlphaChannel
+	property color buttonOutlineColor: {
+		if (valueColor.r + valueColor.g + valueColor.b > 0.5) {
+			return "#BB000000" // Black outline
+		} else {
+			return "#BBFFFFFF" // White outline
+		}
+	}
+
+	property TextField textField: textField
+	property ColorDialog dialog: dialog
 
 	property string configKey: ''
 	property string defaultColor: ''
@@ -65,8 +77,8 @@ RowLayout {
 
 	MouseArea {
 		id: mouseArea
-		width: textField.height
-		height: textField.height
+		Layout.preferredWidth: textField.height
+		Layout.preferredHeight: textField.height
 		hoverEnabled: true
 
 		onClicked: dialog.open()
@@ -75,7 +87,7 @@ RowLayout {
 			anchors.fill: parent
 			color: configColor.valueColor
 			border.width: 2
-			border.color: parent.containsMouse ? theme.highlightColor : "#BB000000"
+			border.color: parent.containsMouse ? theme.highlightColor : buttonOutlineColor
 		}
 	}
 
