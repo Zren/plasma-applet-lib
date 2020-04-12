@@ -12,9 +12,13 @@ PlasmaExtras.ScrollArea {
 	ColumnLayout {
 		width: scrollArea.viewportWidth
 
-		PlasmaExtras.Heading {
+		PlasmaExtras.Title {
 			text: i18n("PlasmaComponents3")
 			color: theme.highlightColor
+		}
+		PlasmaExtras.Paragraph {
+			Layout.fillWidth: true
+			text: i18n("This file contains examples of the components 3.0 module and some best practices of it's use.")
 		}
 
 
