@@ -20,15 +20,21 @@ PlasmaExtras.ScrollArea {
 
 
 		PlasmaExtras.Heading {
+			text: i18n("Toggle")
+		}
+		PlasmaComponents.CheckBox {
+			text: i18n("CheckBox")
+			checked: true
+		}
+		PlasmaComponents.CheckBox {
+			text: i18n("CheckBox")
+			checked: true
+		}
+
+
+
+		PlasmaExtras.Heading {
 			text: i18n("Multiple Choice")
-		}
-		PlasmaComponents.CheckBox {
-			text: i18n("CheckBox")
-			checked: true
-		}
-		PlasmaComponents.CheckBox {
-			text: i18n("CheckBox")
-			checked: true
 		}
 		RowLayout {
 			PlasmaComponents.Label {
