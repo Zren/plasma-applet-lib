@@ -54,6 +54,7 @@ PlasmaExtras.ScrollArea {
 				text: i18n("ComboBox:")
 			}
 			PlasmaComponents.ComboBox {
+				id: comboBox
 				textRole: "text"
 				property string valueRole: "value"
 				model: [
@@ -62,7 +63,16 @@ PlasmaExtras.ScrollArea {
 					{ value: "c", text: i18n("C") },
 				]
 				readonly property var currentValue: currentIndex >= 0 ? model[currentIndex][valueRole] : null
-				readonly property string currentText: currentIndex >= 0 ? model[currentIndex][textRole] : ""
+			}
+		}
+		ColumnLayout {
+			Layout.leftMargin: units.gridUnit * 2
+
+			PlasmaComponents.Label {
+				text: i18n("currentText: %1", comboBox.currentText)
+			}
+			PlasmaComponents.Label {
+				text: i18n("currentValue: %1", comboBox.currentValue)
 			}
 		}
 
