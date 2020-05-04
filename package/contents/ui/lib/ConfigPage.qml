@@ -1,8 +1,11 @@
-// Version 4
+// Version 5
 
 import QtQuick 2.0
 import QtQuick.Layouts 1.0
+import org.kde.kirigami 2.3 as Kirigami
 
+// ConfigPage's parent is a StackView in:
+// https://github.com/KDE/plasma-desktop/blame/master/desktoppackage/contents/configuration/AppletConfiguration.qml
 Item {
 	id: page
 	Layout.fillWidth: true
@@ -13,6 +16,7 @@ Item {
 		id: content
 		anchors.left: parent.left
 		anchors.right: parent.right
+		anchors.rightMargin: Kirigami.Units.largeSpacing // Used instead of calculating ScrollBar.width
 		anchors.top: parent.top
 
 		// Workaround for crash when using default on a Layout.
@@ -32,6 +36,7 @@ Item {
 		visible: active
 		source: "AppletVersion.qml"
 		anchors.right: parent.right
+		anchors.rightMargin: Kirigami.Units.largeSpacing // Used instead of calculating ScrollBar.width
 		anchors.bottom: parent.top
 	}
 }
