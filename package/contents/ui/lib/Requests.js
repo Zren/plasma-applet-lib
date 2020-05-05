@@ -1,5 +1,5 @@
 .pragma library
-// Version 6
+// Version 7
 
 function request(opt, callback) {
 	if (typeof opt === 'string') {
@@ -37,26 +37,30 @@ function request(opt, callback) {
 	req.send(opt.data)
 }
 
+function encodeParams(params) {
+	var s = ''
+	var i = 0
+	for (var key in params) {
+		if (i > 0) {
+			s += '&'
+		}
+		var value = params[key]
+		if (typeof value === "object") {
+			// TODO: Flatten obj={list: [1, 2]} as
+			// obj[list][0]=1
+			// obj[list][1]=2
+		}
+		s += encodeURIComponent(key) + '=' + encodeURIComponent(value)
+		i += 1
+	}
+	return s
+}
+
 function encodeFormData(opt) {
 	opt.headers = opt.headers || {}
 	opt.headers['Content-Type'] = 'application/x-www-form-urlencoded'
 	if (opt.data) {
-		var s = ''
-		var i = 0
-		for (var key in opt.data) {
-			if (i > 0) {
-				s += '&'
-			}
-			var value = opt.data[key]
-			if (typeof value === "object") {
-				// TODO: Flatten obj={list: [1, 2]} as
-				// obj[list][0]=1
-				// obj[list][1]=2
-			}
-			s += encodeURIComponent(key) + '=' + encodeURIComponent(value)
-			i += 1
-		}
-		opt.data = s
+		opt.data = encodeParams(opt.data)
 	}
 	return opt
 }
