@@ -1,5 +1,5 @@
 .pragma library
-// Version 3
+// Version 6
 
 function request(opt, callback) {
 	if (typeof opt === 'string') {
@@ -7,7 +7,13 @@ function request(opt, callback) {
 	}
 	var req = new XMLHttpRequest()
 	req.onerror = function(e) {
-		console.log('XMLHttpRequest.onerror', e.status, e.statusText, e.message, e)
+		console.log('XMLHttpRequest.onerror', e)
+		if (e) {
+			console.log('\t', e.status, e.statusText, e.message)
+			callback(e.message)
+		} else {
+			callback('XMLHttpRequest.onerror(undefined)')
+		}
 	}
 	req.onreadystatechange = function() {
 		if (req.readyState === XMLHttpRequest.DONE) { // https://xhr.spec.whatwg.org/#dom-xmlhttprequest-done
@@ -66,6 +72,9 @@ function post(opt, callback) {
 
 
 function getJSON(opt, callback) {
+	if (typeof opt === 'string') {
+		opt = { url: opt }
+	}
 	opt.headers = opt.headers || {}
 	opt.headers['Accept'] = 'application/json'
 	request(opt, function(err, data, req) {
@@ -73,7 +82,7 @@ function getJSON(opt, callback) {
 			data = JSON.parse(data)
 		}
 		callback(err, data, req)
-	});
+	})
 }
 
 
@@ -93,7 +102,13 @@ function postJSON(opt, callback) {
 function getFile(url, callback) {
 	var req = new XMLHttpRequest()
 	req.onerror = function(e) {
-		console.log('XMLHttpRequest.onerror', e.status, e.statusText, e.message, e)
+		console.log('XMLHttpRequest.onerror', e)
+		if (e) {
+			console.log('\t', e.status, e.statusText, e.message)
+			callback(e.message)
+		} else {
+			callback('XMLHttpRequest.onerror(undefined)')
+		}
 	}
 	req.onreadystatechange = function() {
 		if (req.readyState === 4) {
@@ -128,7 +143,7 @@ function getAppletMetadata(callback) {
 	if (index >= 0) {
 		var a = index + s.length
 		var b = url.indexOf('/', a)
-		// var packageName = url.substr(a, b-a);
+		// var packageName = url.substr(a, b-a)
 		var metadataUrl = url.substr(0, b) + '/metadata.desktop'
 		Requests.getFile(metadataUrl, function(err, data) {
 			if (err) {
@@ -137,7 +152,7 @@ function getAppletMetadata(callback) {
 
 			var metadata = parseMetadata(data)
 			callback(null, metadata)
-		});
+		})
 	} else {
 		return callback('Could not parse version.')
 	}
@@ -148,5 +163,5 @@ function getAppletVersion(callback) {
 		if (err) return callback(err)
 
 		callback(err, metadata['X-KDE-PluginInfo-Version'])
-	});
+	})
 }
