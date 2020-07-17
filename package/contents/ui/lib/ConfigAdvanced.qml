@@ -287,10 +287,14 @@ ColumnLayout {
 				var value = plasmoid.configuration[key]
 				var valueStr = '' + value
 				var node = configDefaults.get(i)
+				if (key === 'minimumWidth') {
+					continue // Ignore
+				}
 				if (!node) {
-					console.log('configDefaults doesn\'t conain an entry for plasmoid.configuration.' + key)
+					console.log('configDefaults doesn\'t contain an entry for plasmoid.configuration.' + key)
 					continue
 				}
+
 				var configType = node.valueType
 				var stringType = node.stringType
 				var defaultValue = node.value
