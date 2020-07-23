@@ -135,8 +135,39 @@ for cat in $catalogs; do
 	# mv "$cat" "$cat.old"
 	mv "$cat.new" "$cat"
 done
+echo "[merge] Done merging messages"
 
+#---
+echo "[merge] Updating .desktop file"
+
+# Generate LINGUAS for msgfmt
+if [ -f "$DIR/LINGUAS" ]; then
+	rm "$DIR/LINGUAS"
+fi
+for cat in $catalogs; do
+	catLocale=`basename ${cat%.*}`
+	echo "${catLocale}" >> "$DIR/LINGUAS"
+done
+
+msgfmt \
+	--desktop \
+	--template="$DIR/../metadata.desktop" \
+	-d ./ \
+	-o "$DIR/new.desktop"
+
+# Place translations at the bottom of the desktop file.
+translatedLines=`cat "$DIR/new.desktop" | grep "]="`
+sed -i '/^Name\[/ d; /^GenericName\[/ d; /^Comment\[/ d; /^Keywords\[/ d' "$DIR/new.desktop"
+echo "" >> "$DIR/new.desktop"
+echo "${translatedLines}" >> "$DIR/new.desktop"
+
+# Cleanup
+mv "$DIR/new.desktop" "$DIR/../metadata.desktop"
+rm "$DIR/LINGUAS"
+
+#---
 # Populate ReadMe.md
+echo "[merge] Updating translate/ReadMe.md"
 sed -i -E 's`share\/plasma\/plasmoids\/(.+)\/translate`share/plasma/plasmoids/'"${plasmoidName}"'/translate`' ./ReadMe.md
 if [[ "$website" == *"github.com"* ]]; then
 	sed -i -E 's`\[new issue\]\(https:\/\/github\.com\/(.+)\/(.+)\/issues\/new\)`[new issue]('"${website}"'/issues/new)`' ./ReadMe.md
@@ -145,4 +176,4 @@ sed -i '/^|/ d' ./ReadMe.md # Remove status table from ReadMe
 cat ./Status.md >> ./ReadMe.md
 rm ./Status.md
 
-echo "[merge] Done merging messages"
+echo "[merge] Done"
