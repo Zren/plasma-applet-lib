@@ -2,12 +2,21 @@
 	"build_systems": [
 		{
 			"name": "Project",
-			"shell_cmd": "QML_DISABLE_DISK_CACHE=true konsole --hold -e \"plasmoidviewer -a package -l topedge -f horizontal -x 0 -y 0\"",
+			"shell_cmd": "konsole --hold -e \"plasmoidviewer -a package -l topedge -f horizontal -x 0 -y 0\"",
+			"env": {
+				"QML_DISABLE_DISK_CACHE": "true",
+				"QT_LOGGING_RULES": "kf.package=false;kf.coreaddons=false;qt.qml.connections.warning=false;"
+			},
 			"working_dir": "${project_path}/",
 			"variants": [
 				{
 					"name": "Run (2x DPI)",
-					"shell_cmd": "QT_DEVICE_PIXEL_RATIO=2 QML_DISABLE_DISK_CACHE=true konsole --hold -e \"plasmoidviewer -a package -l topedge -f horizontal -x 0 -y 0 -s 1920x1080\""
+					"shell_cmd": "konsole --hold -e \"plasmoidviewer -a package -l topedge -f horizontal -x 0 -y 0 -s 1920x1080\"",
+					"env": {
+						"QML_DISABLE_DISK_CACHE": "true",
+						"QT_DEVICE_PIXEL_RATIO": "2",
+						"QT_LOGGING_RULES": "kf.package=false;kf.coreaddons=false;qt.qml.connections.warning=false;"
+					}
 				},
 				{
 					"name": "Reinstall",
