@@ -149,20 +149,27 @@ for cat in $catalogs; do
 	echo "${catLocale}" >> "$DIR/LINGUAS"
 done
 
+cp -f "$DIR/../metadata.desktop" "$DIR/template.desktop"
+sed -i '/^Name\[/ d; /^GenericName\[/ d; /^Comment\[/ d; /^Keywords\[/ d' "$DIR/template.desktop"
+
 msgfmt \
 	--desktop \
-	--template="$DIR/../metadata.desktop" \
-	-d ./ \
+	--template="$DIR/template.desktop" \
+	-d "$DIR/" \
 	-o "$DIR/new.desktop"
 
 # Place translations at the bottom of the desktop file.
 translatedLines=`cat "$DIR/new.desktop" | grep "]="`
 sed -i '/^Name\[/ d; /^GenericName\[/ d; /^Comment\[/ d; /^Keywords\[/ d' "$DIR/new.desktop"
-echo "" >> "$DIR/new.desktop"
+if [ "$(tail -c 2 "$DIR/new.desktop" | wc -l)" != "2" ]; then
+	# Does not end with 2 empty lines, so add an empty line.
+	echo "" >> "$DIR/new.desktop"
+fi
 echo "${translatedLines}" >> "$DIR/new.desktop"
 
 # Cleanup
 mv "$DIR/new.desktop" "$DIR/../metadata.desktop"
+rm "$DIR/template.desktop"
 rm "$DIR/LINGUAS"
 
 #---
