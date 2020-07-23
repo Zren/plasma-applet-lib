@@ -160,12 +160,14 @@ msgfmt \
 
 # Place translations at the bottom of the desktop file.
 translatedLines=`cat "$DIR/new.desktop" | grep "]="`
-sed -i '/^Name\[/ d; /^GenericName\[/ d; /^Comment\[/ d; /^Keywords\[/ d' "$DIR/new.desktop"
-if [ "$(tail -c 2 "$DIR/new.desktop" | wc -l)" != "2" ]; then
-	# Does not end with 2 empty lines, so add an empty line.
-	echo "" >> "$DIR/new.desktop"
+if [ ! -z "${translatedLines}" ]; then
+	sed -i '/^Name\[/ d; /^GenericName\[/ d; /^Comment\[/ d; /^Keywords\[/ d' "$DIR/new.desktop"
+	if [ "$(tail -c 2 "$DIR/new.desktop" | wc -l)" != "2" ]; then
+		# Does not end with 2 empty lines, so add an empty line.
+		echo "" >> "$DIR/new.desktop"
+	fi
+	echo "${translatedLines}" >> "$DIR/new.desktop"
 fi
-echo "${translatedLines}" >> "$DIR/new.desktop"
 
 # Cleanup
 mv "$DIR/new.desktop" "$DIR/../metadata.desktop"
