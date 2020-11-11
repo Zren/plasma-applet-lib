@@ -5,7 +5,7 @@
 			"shell_cmd": "konsole --hold -e \"plasmoidviewer -a package -l topedge -f horizontal -x 0 -y 0\"",
 			"env": {
 				"QML_DISABLE_DISK_CACHE": "true",
-				"QT_LOGGING_RULES": "kf.package=false;kf.coreaddons=false;qt.qml.connections.warning=false;"
+				"QT_LOGGING_RULES": "qml.debug=true;qt.qml.connections.warning=false;kf.package=false;kf.coreaddons=false;kf.plasma.core=false;"
 			},
 			"working_dir": "${project_path}/",
 			"variants": [
@@ -19,11 +19,11 @@
 					}
 				},
 				{
-					"name": "Reinstall",
-					"shell_cmd": "konsole --hold -e \"sh ./reinstall\""
+					"name": "Reinstall Widget",
+					"shell_cmd": "konsole --hold -e \"sh ./install\""
 				},
 				{
-					"name": "Build",
+					"name": "Build Widget Release",
 					"shell_cmd": "konsole --hold -e \"sh ./build\""
 				},
 				{

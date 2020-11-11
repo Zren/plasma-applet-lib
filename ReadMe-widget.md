@@ -27,6 +27,6 @@ cd widgetname
 sh ./install
 ```
 
-To update, run `git pull` then `sh ./reinstall`. Please note this script will restart `plasmashell` (so you don't have to relog).
+To update, run `git pull` then `sh ./install --restart`. Please note this script will restart `plasmashell` so you don't have to relog.
 
 
