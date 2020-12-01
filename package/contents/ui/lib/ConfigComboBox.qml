@@ -1,4 +1,4 @@
-// Version 5
+// Version 6
 
 import QtQuick 2.0
 import QtQuick.Controls 1.0
@@ -24,6 +24,7 @@ ConfigComboBox {
 			{ value: "b", text: i18n("B") },
 			{ value: "c", text: i18n("C") },
 		]
+		populated = true
 	}
 }
 */
