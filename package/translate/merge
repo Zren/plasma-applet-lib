@@ -1,5 +1,5 @@
 #!/bin/sh
-# Version: 18
+# Version: 19
 
 # https://techbase.kde.org/Development/Tutorials/Localization/i18n_Build_Systems
 # https://techbase.kde.org/Development/Tutorials/Localization/i18n_Build_Systems/Outside_KDE_repositories
@@ -163,6 +163,7 @@ echo "[merge] Updating .desktop file"
 if [ -f "$DIR/LINGUAS" ]; then
 	rm "$DIR/LINGUAS"
 fi
+touch "$DIR/LINGUAS"
 for cat in $catalogs; do
 	catLocale=`basename ${cat%.*}`
 	echo "${catLocale}" >> "$DIR/LINGUAS"
