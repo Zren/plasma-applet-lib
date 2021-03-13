@@ -1,19 +1,16 @@
 .pragma library
-// Version 7
+// Version 8
 
 function request(opt, callback) {
 	if (typeof opt === 'string') {
 		opt = { url: opt }
 	}
 	var req = new XMLHttpRequest()
-	req.onerror = function(e) {
-		console.log('XMLHttpRequest.onerror', e)
-		if (e) {
-			console.log('\t', e.status, e.statusText, e.message)
-			callback(e.message)
-		} else {
-			callback('XMLHttpRequest.onerror(undefined)')
-		}
+	req.onerror = function() {
+		// Network Error / No Connection
+		console.log('XMLHttpRequest.onerror', req.status)
+		var msg = "HTTP Error " + req.status
+		callback(msg, null, req)
 	}
 	req.onreadystatechange = function() {
 		if (req.readyState === XMLHttpRequest.DONE) { // https://xhr.spec.whatwg.org/#dom-xmlhttprequest-done
@@ -23,7 +20,7 @@ function request(opt, callback) {
 				if (req.status === 0) {
 					console.log('HTTP 0 Headers: \n' + req.getAllResponseHeaders())
 				}
-				var msg = "HTTP Error " + req.status + ": " + req.statusText
+				var msg = "HTTP Error " + req.status
 				callback(msg, req.responseText, req)
 			}
 		}
@@ -105,14 +102,11 @@ function postJSON(opt, callback) {
 
 function getFile(url, callback) {
 	var req = new XMLHttpRequest()
-	req.onerror = function(e) {
-		console.log('XMLHttpRequest.onerror', e)
-		if (e) {
-			console.log('\t', e.status, e.statusText, e.message)
-			callback(e.message)
-		} else {
-			callback('XMLHttpRequest.onerror(undefined)')
-		}
+	req.onerror = function() {
+		// Network Error / No Connection
+		console.log('XMLHttpRequest.onerror', req.status)
+		var msg = "HTTP Error " + req.status
+		callback(msg, null, req)
 	}
 	req.onreadystatechange = function() {
 		if (req.readyState === 4) {
