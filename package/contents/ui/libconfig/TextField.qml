@@ -1,7 +1,8 @@
-// Version 3
+// Version 4
 
 import QtQuick 2.0
 import QtQuick.Controls 2.0 as QQC2
+import org.kde.kirigami 2.0 as Kirigami
 
 QQC2.TextField {
 	id: textField
@@ -19,9 +20,12 @@ QQC2.TextField {
 
 	property string defaultValue: ""
 
+	rightPadding: clearButton.width + Kirigami.Units.smallSpacing
+
 	property alias clearButton: clearButton
 	QQC2.ToolButton {
 		id: clearButton
+		visible: textField.text != textField.defaultValue
 		icon.name: "edit-clear"
 		onClicked: textField.text = defaultValue
 
