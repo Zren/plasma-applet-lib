@@ -21,7 +21,7 @@ I recommend [downloading the zip](https://github.com/Zren/plasma-applet-lib/arch
 * `package/contents/ui/lib` contains a number of reuseable QML/JS files.
 	* `Logger.qml` is useful if you want to log pretty JSON formatting, but only when debugging. Add a `Logger { id: logger; name: "widgetname"; }` in your `main.qml`. You can then use logger.logJSON('obj', obj) to always log the object. You can also use `logger.debugJSON('obj', obj)` to only show the log statement if you set `Logger { showDebug: true }` which can easily be commented out when preparing for release.
 	* `ExecUtil.qml` is a `PlasmaCore.DataSource { engine: "executable" }` with a `exec(cmd, callback)` function added.
-* `package/contents/ui/libconfig` contains a number of reuseable QML form controls for editing config values. They are designed so the user does **not** need to click Apply. You can easily add a control with `LibConfig.ColorField { configKey: "textColor" }`.
+* `package/contents/ui/libconfig` contains a number of reuseable QML form controls for editing config values. They are designed so the user does **not** need to click Apply. You can easily bind one of these controls to the config by setting the `configKey` property.
 	* [libconfig/CheckBox.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/CheckBox.qml) for on/off booleans values.
 	* [libconfig/SpinBox.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/SpinBox.qml) for Integer or Real numbers.
 	* [libconfig/TextField.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextField.qml) for a single line of text.
