@@ -23,8 +23,6 @@ I recommend [downloading the zip](https://github.com/Zren/plasma-applet-lib/arch
 	* `ExecUtil.qml` is a `PlasmaCore.DataSource { engine: "executable" }` with a `exec(cmd, callback)` function added.
 * `package/contents/ui/libconfig` contains a number of reuseable QML form controls for editing config values. They are designed so the user does **not** need to click Apply. You can easily bind one of these controls to the config by setting the `configKey` property.
 	* [libconfig/CheckBox.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/CheckBox.qml) for on/off booleans values.
-	* [libconfig/SpinBox.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/SpinBox.qml) for Integer or Real numbers.
-	* [libconfig/TextField.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextField.qml) for a single line of text.
 	* [libconfig/ColorField.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/ColorField.qml) for use with a `String` or `Color` config data type. If you use use a `String` data type, you can treat an empty string as a certain color theme color. Eg:
 	  ```qml
 	  import "./libconfig" as LibConfig
@@ -33,9 +31,6 @@ I recommend [downloading the zip](https://github.com/Zren/plasma-applet-lib/arch
 	    defaultColor: PlasmaCore.ColorScope.textColor
 	  }
 	  ```
-	* [libconfig/IconField.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/IconField.qml) based on the Application Launcher icon selector.
-	* [libconfig/TextArea.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextArea.qml) for a string with multiple lines of text.
-	    * [libconfig/TextAreaStringList.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextAreaStringList.qml) overloads `libconfig/TextArea.qml`'s `valueToText(value)` and `textToValue(text)` functions to treat a new line as the seperator in the `StringList`.
 	* [libconfig/ComboBox.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/ComboBox.qml) is useful for creating enums using the `String` config data type. KConfig comes with a enum datatype as well, but you have to either use hardcoded integers (with comments), or [declare the enum](https://stackoverflow.com/a/48460159/947742) in your QML code and keep it in sync. String comparison is less efficient but is easier to program with.
 	  ```qml
 	  import "./libconfig" as LibConfig
@@ -48,9 +43,14 @@ I recommend [downloading the zip](https://github.com/Zren/plasma-applet-lib/arch
 	  	]
 	  }
 	  ```
-	    * [libconfig/FontFamily.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/FontFamily.qml) inherits `libconfig/ComboBox.qml` and is populated with all available fonts.
+		* [FontFamily.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/FontFamily.qml) inherits `libconfig/ComboBox.qml` and is populated with all available fonts.
+	* [libconfig/IconField.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/IconField.qml) based on the Application Launcher icon selector.
 	* [libconfig/RadioButtonGroup.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/RadioButtonGroup.qml) takes a similar model as `libconfig/ComboBox.qml` but will display the options as [`RadioButton`](https://doc.qt.io/qt-5/qml-qtquick-controls2-radiobutton.html).
+	* [libconfig/SpinBox.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/SpinBox.qml) for Integer or Real numbers.
 	* [libconfig/TextAlign.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextAlign.qml) for use with an `Int` config data type. It has your typical 4 buttons for left/center/right/justify alignment. It serializes the `Text.AlignHCenter` enum.
-	    * [TextFormat.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextFormat.qml) is used to toggle bold, italic, underline, and embeds the text alignment. For use with 3 `Bool` config keys and 1 `Int` config key (used for the embeded `libconfig/TextAlign.qml`).
+		* [TextFormat.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextFormat.qml) is used to toggle bold, italic, underline, and embeds the text alignment. For use with 3 `Bool` config keys and 1 `Int` config key (used for the embeded `libconfig/TextAlign.qml`).
+	* [libconfig/TextArea.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextArea.qml) for a string with multiple lines of text.
+		* [TextAreaStringList.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextAreaStringList.qml) overloads `libconfig/TextArea.qml`'s `valueToText(value)` and `textToValue(text)` functions to treat a new line as the seperator in the `StringList`.
+	* [libconfig/TextField.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextField.qml) for a single line of text.
 * `Changelog.md` is for listing your new features for users. The KDE Store has a changelog feature which you can paste your feature lists into.
 * `mv ReadMe-widget.md ReadMe.md` you should always have a ReadMe for your project, overwrite this library readme with the one designed for your widget.
