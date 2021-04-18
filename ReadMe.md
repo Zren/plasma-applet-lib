@@ -21,25 +21,37 @@ I recommend [downloading the zip](https://github.com/Zren/plasma-applet-lib/arch
 * `package/contents/ui/lib` contains a number of reuseable QML/JS files.
 	* `Logger.qml` is useful if you want to log pretty JSON formatting, but only when debugging. Add a `Logger { id: logger; name: "widgetname"; }` in your `main.qml`. You can then use logger.logJSON('obj', obj) to always log the object. You can also use `logger.debugJSON('obj', obj)` to only show the log statement if you set `Logger { showDebug: true }` which can easily be commented out when preparing for release.
 	* `ExecUtil.qml` is a `PlasmaCore.DataSource { engine: "executable" }` with a `exec(cmd, callback)` function added.
-	* Config
-		* `ConfigPage.qml` and `AppletVersion.qml` are used as the root item in a widget config tab. It's basically a fancy [`ColumnLayout`](https://doc.qt.io/qt-5/qml-qtquick-layouts-columnlayout.html) that displays the widget version that is in `metadata.desktop`.
-		* `ConfigAdvanced.qml` reads `config/main.xml` to know all config values and their default values. It displays every config value and you can even modify a number of data types. It's useful for easily observing hidden config variables without setting up controls in the config page.
-		* `ConfigSection.qml` is designed to work like a [`GroupBox`](https://doc.qt.io/qt-5/qml-qtquick-controls-groupbox.html) but guarantees the title is left aligned, rather than using the Breeze Qt widget theme which has titles center aligned.
-		* Various form controls for editing config values. They are designed so the user does **not** need to click Apply. You can easily add a control with `ConfigColor { configKey: "textColor" }`.
-			* `ConfigColor.qml`
-			* `ConfigComboBox.qml` You will need to populate the dropdown with:  
-			  ```
-			  ConfigComboBox {
-			  	configKey: "appDescription"
-			  	model: [
-			  		{ value: "a", text: i18n("A") },
-			  		{ value: "b", text: i18n("B") },
-			  		{ value: "c", text: i18n("C") },
-			  	]
-			  }
-			  ```
-			* `ConfigIcon.qml` is similar to the App Menu's icon selector, but also contains a [TextField](https://doc.qt.io/qt-5/qml-qtquick-controls-textfield.html).
-			* `ConfigSpinBox.qml` is used for Integers and Doubles (real numbers).
-			* `ConfigStringList.qml` displays a list of strings in a [TextArea](https://doc.qt.io/qt-5/qml-qtquick-controls-textarea.html) which each line is an item.
+* `package/contents/ui/libconfig` contains a number of reuseable QML/JS files for configuration.
+	* Various form controls for editing config values. They are designed so the user does **not** need to click Apply. You can easily add a control with `LibConfig.ColorField { configKey: "textColor" }`.
+	* [libconfig/CheckBox.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/CheckBox.qml) for on/off booleans values.
+	* [libconfig/SpinBox.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/SpinBox.qml) for Integer or Real numbers.
+	* [libconfig/TextField.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextField.qml) for a single line of text.
+	* [libconfig/ColorField.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/ColorField.qml) for use with a `String` or `Color` config data type. If you use use a `String` data type, you can treat an empty string as a certain color theme color. Eg:
+	  ```qml
+	  import "./libconfig" as LibConfig
+	  LibConfig.ColorField {
+	    configKey: 'labelColor'
+	    defaultColor: PlasmaCore.ColorScope.textColor
+	  }
+	  ```
+	* [libconfig/IconField.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/IconField.qml) based on the Application Launcher icon selector.
+	* [libconfig/TextArea.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextAreaStringList.qml) for a string with multiple lines of text.
+	    * [libconfig/TextAreaStringList.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextAreaStringList.qml) overloads `libconfig/TextArea.qml`'s `valueToText(value)` and `textToValue(text)` functions to treat a new line as the seperator in the `StringList`.
+	* [libconfig/ComboBox.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/ComboBox.qml) is useful for creating enums using the `String` config data type. KConfig comes with a enum datatype as well, but you have to either use hardcoded integers (with comments), or [declare the enum](https://stackoverflow.com/a/48460159/947742) in your QML code and keep it in sync. String comparison is less efficient but is easier to program with.
+	  ```
+	  import "./libconfig" as LibConfig
+	  LibConfig.ComboBox {
+	  	configKey: "variableName"
+	  	model: [
+	  		{ value: "a", text: i18n("A") },
+	  		{ value: "b", text: i18n("B") },
+	  		{ value: "c", text: i18n("C") },
+	  	]
+	  }
+	  ```
+	    * [libconfig/FontFamily.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/FontFamily.qml) inherits `libconfig/ComboBox.qml` and is populated with all available fonts.
+	* [libconfig/RadioButtonGroup.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/RadioButtonGroup.qml) takes a similar model as `libconfig/ComboBox.qml` but will display the options as [`RadioButton`](https://doc.qt.io/qt-5/qml-qtquick-controls2-radiobutton.html).
+	* [libconfig/TextAlign.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextAlign.qml) for use with an `Int` config data type. It has your typical 4 buttons for left/center/right/justify alignment. It serializes the `Text.AlignHCenter` enum.
+	    * [TextFormat.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextFormat.qml) is used to toggle bold, italic, underline, and embeds the text alignment. For use with 3 `Bool` config keys and 1 `Int` config key (used for the embeded `libconfig/TextAlign.qml`).
 * `Changelog.md` is for listing your new features for users. The KDE Store has a changelog feature which you can paste your feature lists into.
 * `mv ReadMe-widget.md ReadMe.md` you should always have a ReadMe for your project, overwrite this library readme with the one designed for your widget.
