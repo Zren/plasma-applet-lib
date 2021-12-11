@@ -1,4 +1,4 @@
-// Version 5
+// Version 6
 
 import QtQuick 2.0
 import QtQuick.Controls 1.0
@@ -51,9 +51,9 @@ ColumnLayout {
 				id: numberControl
 				SpinBox {
 					value: modelValue
-					property bool isInteger: modelConfigType === 'UInt' || modelConfigType === 'int'
+					readonly property bool isInteger: modelConfigType === 'uint' || modelConfigType === 'int'
 					decimals: isInteger ? 0 : 3
-					maximumValue: 2147483647
+					maximumValue: Number.MAX_SAFE_INTEGER
 					Component.onCompleted: {
 						valueChanged.connect(function() {
 							plasmoid.configuration[modelKey] = value
@@ -295,7 +295,7 @@ ColumnLayout {
 					continue
 				}
 
-				var configType = node.valueType
+				var configType = node.valueType.toLowerCase()
 				var stringType = node.stringType
 				var defaultValue = node.value
 
