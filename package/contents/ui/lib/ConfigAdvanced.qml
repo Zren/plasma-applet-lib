@@ -9,15 +9,17 @@ import org.kde.kirigami 2.0 as Kirigami
 ColumnLayout {
 	id: page
 
+	SystemPalette { id: systemPalette }
+
 	Component {
 		id: textFieldStyle
 		TextFieldStyle {
-			// textColor: Kirigami.Theme.textColor
+			textColor: control.activeFocus ? systemPalette.text : systemPalette.text
 
 			background: Rectangle {
 				radius: 2
-				color: control.activeFocus ? Kirigami.Theme.viewBackgroundColor : "transparent"
-				border.color: control.activeFocus ? Kirigami.Theme.highlightColor : "transparent"
+				color: control.activeFocus ? systemPalette.base : "transparent"
+				border.color: control.activeFocus ? systemPalette.highlight : "transparent"
 				border.width: 1
 			}
 		}
