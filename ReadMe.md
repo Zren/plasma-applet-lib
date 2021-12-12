@@ -2,7 +2,7 @@
 
 This is a folder of various reuseable files for developing a Plasma Widget.
 
-I recommend [downloading the zip](https://github.com/Zren/plasma-applet-lib/archive/master.zip) over cloning this repo, as you might not need everything in this project. It will also give your repo a clean git histroy.
+I recommend [downloading the zip](https://github.com/Zren/plasma-applet-lib/archive/master.zip) over cloning this repo, as you might not need everything in this project. It will also give your repo a clean git history.
 
 ## Library Contents
 
@@ -54,3 +54,16 @@ I recommend [downloading the zip](https://github.com/Zren/plasma-applet-lib/arch
 	* [libconfig/TextField.qml](https://github.com/Zren/plasma-applet-lib/blob/master/package/contents/ui/libconfig/TextField.qml) for a single line of text.
 * `Changelog.md` is for listing your new features for users. The KDE Store has a changelog feature which you can paste your feature lists into.
 * `mv ReadMe-widget.md ReadMe.md` you should always have a ReadMe for your project, overwrite this library readme with the one designed for your widget.
+
+
+## Distro Dependencies
+
+If you ship your widget on the KDE Store, you should try to support the latest LTS distros.
+
+Ubuntu 20.04 only uses **Qt 5.12** and **KDE Framework 5.68**.
+
+* ~~Ubuntu 18.04 LTS: [Qt 5.9](https://repology.org/project/qt/versions#ubuntu_18_04) / [Plasma 5.12](https://repology.org/project/plasma-desktop/versions#ubuntu_20_04) / [KDE Framework 5.44](https://repology.org/project/plasma-framework/versions#ubuntu_18_04)~~ **(Not supported since 21.04)**
+* Debian 10 (2019-July): [Qt 5.11](https://repology.org/project/qt/versions#debian_10) / [Plasma 5.14](https://repology.org/project/plasma-desktop/versions#debian_10) / [KDE Framework 5.54](https://repology.org/project/plasma-framework/versions#debian_10)
+* Ubuntu 20.04 LTS: [Qt 5.12](https://repology.org/project/qt/versions#ubuntu_20_04) (2018-Nov) / [Plasma 5.18](https://repology.org/project/plasma-desktop/versions#ubuntu_20_04) (2020-Feb) / [KDE Framework 5.68](https://repology.org/project/plasma-framework/versions#ubuntu_20_04) (2020-Mar)
+* Debian 11 (2021-Aug): [Qt 5.15](https://repology.org/project/qt/versions#debian_11) / [Plasma 5.20](https://repology.org/project/plasma-desktop/versions#debian_11) / [KDE Framework 5.78](https://repology.org/project/plasma-framework/versions#debian_11)
+
