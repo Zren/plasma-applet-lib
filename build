@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 10
+# Version 11
 
 ### User Variables
 qtMinVer="5.12"
@@ -15,6 +15,9 @@ startDir=$PWD
 # See https://zren.github.io/kde/versions/ for distro versions
 if [ -f checkimports.py ]; then
 	python3 checkimports.py --qt="$qtMinVer" --kf="$kfMinVer" --plasma="$plasmaMinVer"
+	if [ $? == 1 ]; then
+		exit 1
+	fi
 fi
 
 ### Translations
