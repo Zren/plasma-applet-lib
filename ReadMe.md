@@ -66,4 +66,4 @@ Ubuntu 20.04 only uses **Qt 5.12** and **KDE Framework 5.68**.
 * Debian 10 (2019-July): [Qt 5.11](https://repology.org/project/qt/versions#debian_10) / [Plasma 5.14](https://repology.org/project/plasma-desktop/versions#debian_10) / [KDE Framework 5.54](https://repology.org/project/plasma-framework/versions#debian_10)
 * Ubuntu 20.04 LTS: [Qt 5.12](https://repology.org/project/qt/versions#ubuntu_20_04) (2018-Nov) / [Plasma 5.18](https://repology.org/project/plasma-desktop/versions#ubuntu_20_04) (2020-Feb) / [KDE Framework 5.68](https://repology.org/project/plasma-framework/versions#ubuntu_20_04) (2020-Mar)
 * Debian 11 (2021-Aug): [Qt 5.15](https://repology.org/project/qt/versions#debian_11) / [Plasma 5.20](https://repology.org/project/plasma-desktop/versions#debian_11) / [KDE Framework 5.78](https://repology.org/project/plasma-framework/versions#debian_11)
-
+* https://zren.github.io/kde/versions/ has more distros+versions and is kept up to date.
