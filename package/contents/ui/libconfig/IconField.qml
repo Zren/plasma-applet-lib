@@ -1,4 +1,4 @@
-// Version 6
+// Version 7
 
 import QtQuick 2.0
 import QtQuick.Controls 2.0 as QQC2
@@ -68,7 +68,7 @@ RowLayout {
 			QQC2.MenuItem {
 				text: i18ndc("plasma_applet_org.kde.plasma.kickoff", "@item:inmenu Reset icon to default", "Clear Icon")
 				icon.name: "edit-clear"
-				onClicked: iconField.value = defaultValue
+				onClicked: iconField.value = iconField.defaultValue
 			}
 		}
 	}
@@ -90,8 +90,8 @@ RowLayout {
 				QQC2.ToolButton {
 					id: clearButton
 					visible: iconField.configValue != iconField.defaultValue
-					icon.name: "edit-clear"
-					onClicked: iconField.value = defaultValue
+					icon.name: iconField.defaultValue === "" ? "edit-clear" : "edit-undo"
+					onClicked: iconField.value = iconField.defaultValue
 
 					anchors.top: parent.top
 					anchors.right: parent.right
