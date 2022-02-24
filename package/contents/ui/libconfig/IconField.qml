@@ -1,4 +1,4 @@
-// Version 8
+// Version 9
 
 import QtQuick 2.0
 import QtQuick.Controls 2.0 as QQC2
@@ -24,6 +24,7 @@ RowLayout {
 	property int previewIconSize: Kirigami.Units.iconSizes.medium
 	property string defaultValue: ""
 	property alias placeholderValue: textField.placeholderText
+	property var presetValues: []
 
 	// Based on org.kde.plasma.kickoff
 	QQC2.Button {
@@ -106,6 +107,19 @@ RowLayout {
 				id: browseButton
 				icon.name: "document-open"
 				onClicked: dialogLoader.active = true
+			}
+		}
+
+		Flow {
+			Layout.fillWidth: true
+			Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+			Repeater {
+				model: presetValues
+				QQC2.Button {
+					icon.name: modelData
+					text: modelData
+					onClicked: iconField.value = modelData
+				}
 			}
 		}
 	}
