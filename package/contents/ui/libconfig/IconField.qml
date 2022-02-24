@@ -1,4 +1,4 @@
-// Version 7
+// Version 8
 
 import QtQuick 2.0
 import QtQuick.Controls 2.0 as QQC2
@@ -29,6 +29,7 @@ RowLayout {
 	QQC2.Button {
 		id: iconButton
 		padding: Kirigami.Units.smallSpacing
+		Layout.alignment: Qt.AlignTop
 
 		// KDE QQC2 sets implicitSize to background.implicitSize ignoring padding/inset properties.
 		implicitWidth: leftPadding + contentItem.implicitWidth + rightPadding
