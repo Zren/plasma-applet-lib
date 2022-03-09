@@ -1,9 +1,9 @@
-// Version 2
+// Version 3
 
 import QtQuick 2.0
 import QtQuick.Controls 2.0 as QQC2
 import QtQuick.Layouts 1.0
-import org.kde.kirigami 2.0 as Kirigami
+import org.kde.kirigami 2.2 as Kirigami
 
 QQC2.Label {
 	Layout.fillWidth: true
