@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 12
+# Version 13
 
 ### User Variables
 qtMinVer="5.12"
@@ -24,10 +24,6 @@ fi
 if [ -d "package/translate" ]; then
 	echo "[build] translate dir found, running merge."
 	(cd package/translate && sh ./merge)
-	# if [ -f "package/translate/sync" ]; then
-	# 	echo "[build] translation sync script found, running sync."
-	# 	(cd package/translate && sh ./sync widgetname widgetname)
-	# fi
 	(cd package/translate && sh ./build)
 	if [ "$(git diff --stat .)" != "" ]; then
 		echo "[build] Changed detected. Cancelling build."
