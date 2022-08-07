@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# Version 1
+# Version 2
 import subprocess
 import os
 import sys
@@ -36,7 +36,6 @@ class LibraryChecks:
 		if len(self.patternList) == 0:
 			return
 		patternStr = '\\|'.join(self.patternList)
-		# cmd = ['bash', '-c', 'echo "$PWD"']
 		cmd = 'grep --include=\\*.qml \'' + patternStr + '\' --recursive .'
 		if sys.stdout.isatty():
 			cmd += ' --color=always'
