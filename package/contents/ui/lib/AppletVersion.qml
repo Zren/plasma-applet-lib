@@ -17,10 +17,10 @@ Label {
 		engine: "executable"
 		connectedSources: []
 		onNewData: {
-			var exitCode = data["exit code"]
-			var exitStatus = data["exit status"]
-			var stdout = data["stdout"]
-			var stderr = data["stderr"]
+			let exitCode = data["exit code"]
+			let exitStatus = data["exit status"]
+			let stdout = data["stdout"]
+			let stderr = data["stderr"]
 			exited(exitCode, exitStatus, stdout, stderr)
 			disconnectSource(sourceName) // cmd finished
 		}
@@ -38,7 +38,7 @@ Label {
 	}
 
 	Component.onCompleted: {
-		var cmd = 'kreadconfig5 --file "' + metadataFilepath + '" --group "Desktop Entry" --key "X-KDE-PluginInfo-Version"'
+		let cmd = 'kreadconfig5 --file "' + metadataFilepath + '" --group "Desktop Entry" --key "X-KDE-PluginInfo-Version"'
 		executable.exec(cmd)
 	}
 
