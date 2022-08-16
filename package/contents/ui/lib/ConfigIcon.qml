@@ -1,4 +1,4 @@
-// Version: 3
+// Version: 4
 
 import QtQuick 2.0
 import QtQuick.Controls 1.0
@@ -51,7 +51,7 @@ RowLayout {
 		PlasmaCore.FrameSvgItem {
 			id: previewFrame
 			anchors.centerIn: parent
-			imagePath: plasmoid.location === PlasmaCore.Types.Vertical || plasmoid.location === PlasmaCore.Types.Horizontal
+			imagePath: plasmoid.formFactor === PlasmaCore.Types.Vertical || plasmoid.formFactor === PlasmaCore.Types.Horizontal
 					 ? "widgets/panel-background" : "widgets/background"
 			width: previewIconSize + fixedMargins.left + fixedMargins.right
 			height: previewIconSize + fixedMargins.top + fixedMargins.bottom
