@@ -95,6 +95,9 @@ def checkImports(args):
 
 	plasmaChecks = LibraryChecks('Plasma', args.plasmaMinVer)
 	plasmaChecks.checkPattern('5.13', 'WeatherPlugin.Util') # https://invent.kde.org/plasma/kdeplasma-addons/-/commit/2997d253fa3bf7c43a36e16827d6b34d282467ee
+	plasmaChecks.checkPattern('5.25', 'Wallpaper.ImageBackend') # https://invent.kde.org/plasma/plasma-workspace/-/commit/956fdd0b34a44304e6af9419e01745b18e1696f2
+	plasmaChecks.checkPattern('5.26', 'Wallpaper.MediaProxy') # https://invent.kde.org/plasma/plasma-workspace/-/commit/8b641963420311777217905ec13368dd850c13b6
+	plasmaChecks.checkPattern('5.99', 'Wallpaper.Image') # Removed in Plasma 5.25 https://invent.kde.org/plasma/plasma-workspace/-/commit/956fdd0b34a44304e6af9419e01745b18e1696f2
 	plasmaChecks.checkPattern('5.99', 'WeatherPlugin.ServiceListModel') # Removed in Plasma 5.24 https://invent.kde.org/plasma/kdeplasma-addons/-/commit/2484b96f663aa3226271a4db1f7cef0948d3b605
 	plasmaChecks.performGrep()
 
