@@ -1,11 +1,12 @@
 #!/bin/bash
-# Version 13
+# Version 14
 
 ### User Variables
 qtMinVer="5.12"
 kfMinVer="5.68"
 plasmaMinVer="5.18"
 filenameTag="-plasma${plasmaMinVer}"
+packageExt="plasmoid"
 
 
 ### Misc
@@ -54,15 +55,15 @@ fi
 
 
 ### *.plasmoid
-filename="${packageName}-v${packageVersion}${filenameTag}.plasmoid"
-rm ${packageName}-v*.plasmoid # Cleanup
+filename="${packageName}-v${packageVersion}${filenameTag}.${packageExt}"
+rm ${packageName}-v*.${packageExt} # Cleanup
 (cd package \
 	&& zip -r $filename * \
 	&& mv $filename $startDir/$filename \
 )
 cd $startDir
-echo "[plasmoid] md5: $(md5sum $filename | awk '{ print $1 }')"
-echo "[plasmoid] sha256: $(sha256sum $filename | awk '{ print $1 }')"
+echo "[${packageExt}] md5: $(md5sum $filename | awk '{ print $1 }')"
+echo "[${packageExt}] sha256: $(sha256sum $filename | awk '{ print $1 }')"
 
 
 ### Done
