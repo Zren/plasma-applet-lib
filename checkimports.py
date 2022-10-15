@@ -30,7 +30,8 @@ class LibraryChecks:
 		major, minor = version(targetVer)
 		if self.major == major and self.minor < minor:
 			# print('[CheckImport] Checking {}'.format(patternStr))
-			self.patternList.append(patternStr)
+			notComment = r'\s*[^/]{2}.*'
+			self.patternList.append(notComment + patternStr)
 
 	def performGrep(self):
 		if len(self.patternList) == 0:
