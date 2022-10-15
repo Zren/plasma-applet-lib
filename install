@@ -23,9 +23,11 @@ if [ $? == 0 ]; then
 fi
 
 if $isAlreadyInstalled; then
+	# Eg: kpackagetool5 -t "Plasma/Applet" -u package
 	kpackagetool5 -t "${packageServiceType}" -u package
 	restartPlasmashell=true
 else
+	# Eg: kpackagetool5 -t "Plasma/Applet" -i package
 	kpackagetool5 -t "${packageServiceType}" -i package
 fi
 
