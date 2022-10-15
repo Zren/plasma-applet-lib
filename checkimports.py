@@ -14,6 +14,23 @@ DEF_PLASMA_VERSION='5.18'
 def version(verStr):
 	return map(int, verStr.split('.'))
 
+def isEmptyStr(s):
+	return s != ''
+
+grepMatchStart = '\x1b[01;31m\x1b[K'
+def isNotComment(s):
+	if '//' not in s:
+		return True
+	if grepMatchStart not in s:
+		# grep output has changed since we can't find the match.
+		sys.stderr.write('[error] Could not find match in grep output.\n')
+		sys.stderr.write('Looking for {}\n'.format(str(grepMatchStart.encode('utf-8'))))
+		sys.stderr.write('In: {}\n'.format(str(s.encode('utf-8'))))
+		sys.exit(1)
+		return True
+	matchInComment = s.index('//') < s.index(grepMatchStart)
+	return not matchInComment
+
 class LibraryChecks:
 	def __init__(self, name, minVer):
 		self.name = name
@@ -30,8 +47,7 @@ class LibraryChecks:
 		major, minor = version(targetVer)
 		if self.major == major and self.minor < minor:
 			# print('[CheckImport] Checking {}'.format(patternStr))
-			notComment = r'\s*[^/]{2}.*'
-			self.patternList.append(notComment + patternStr)
+			self.patternList.append(patternStr)
 
 	def performGrep(self):
 		if len(self.patternList) == 0:
@@ -44,9 +60,19 @@ class LibraryChecks:
 		proc = subprocess.run(cmd, shell=True, capture_output=True)
 
 		if proc.returncode == 0: # Found results
-			print('[CheckImport] Target {} version is {} but found:'.format(self.name, self.minVer))
-			print(proc.stdout.decode('utf-8'))
-			sys.exit(1)
+			grepOutput = proc.stdout.decode('utf-8')
+			# Filter out matches in comments
+			grepOutput = grepOutput.split('\n')
+			grepOutput = filter(isEmptyStr, grepOutput)
+			grepOutput = filter(isNotComment, grepOutput)
+			grepOutput = list(grepOutput)
+			if len(grepOutput) > 0:
+				grepOutput = '\n'.join(grepOutput)
+				print('[CheckImport] Target {} version is {} but found:'.format(self.name, self.minVer))
+				print(grepOutput)
+				sys.exit(1)
+			else: # Only matched comments
+				pass
 		elif proc.returncode == 1: # Found no results
 			pass
 		else: # Error proc.returncode == 2
