@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 15
+# Version 16
 
 ### User Variables
 qtMinVer="5.12"
@@ -11,6 +11,17 @@ packageExt="plasmoid"
 
 ### Misc
 startDir=$PWD
+
+### Colors
+TC_Red='\033[31m'
+TC_Orange='\033[33m'
+TC_LightGray='\033[90m'
+TC_LightRed='\033[91m'
+TC_LightGreen='\033[92m'
+TC_Yellow='\033[93m'
+TC_LightBlue='\033[94m'
+TC_Bold='\033[1m'
+TC_Reset='\033[0m'
 
 ### Check QML Versions
 # See https://zren.github.io/kde/versions/ for distro versions
@@ -57,9 +68,9 @@ fi
 ### *.plasmoid
 
 if ! type "zip" > /dev/null; then
-	echo "[error] 'zip' command not found."
-	if ! type "zypper" > /dev/null; then
-		echo "[OpenSUSE] Please run: sudo zypper install zip"
+	echo -e "${TC_Red}[error] 'zip' command not found.${TC_Reset}"
+	if type "zypper" > /dev/null; then
+		echo -e "${TC_Red}[error] Opensuse detected, please run: ${TC_Bold}sudo zypper install zip${TC_Reset}"
 	fi
 	exit 1
 fi
