@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 4
+# Version 5
 
 # This script detects if the widget is already installed.
 # If it is, it will use --upgrade instead and restart plasmashell.
@@ -20,6 +20,16 @@ isAlreadyInstalled=false
 kpackagetool5 --type="${packageServiceType}" --show="$packageNamespace" &> /dev/null
 if [ $? == 0 ]; then
 	isAlreadyInstalled=true
+fi
+
+### metadata.desktop => metadata.json
+if command -v desktoptojson &> /dev/null ; then
+	genOutput=`desktoptojson --serviceType="plasma-applet.desktop" -i "$PWD/package/metadata.desktop" -o "$PWD/package/metadata.json"`
+	if [ "$?" != "0" ]; then
+		exit 1
+	fi
+	# Tabify metadata.json
+	sed -i '{s/ \{4\}/\t/g}' "$PWD/package/metadata.json"
 fi
 
 if $isAlreadyInstalled; then
