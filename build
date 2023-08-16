@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 14
+# Version 15
 
 ### User Variables
 qtMinVer="5.12"
@@ -26,7 +26,7 @@ if [ -d "package/translate" ]; then
 	echo "[build] translate dir found, running merge."
 	(cd package/translate && sh ./merge)
 	(cd package/translate && sh ./build)
-	if [ "$(git diff --stat .)" != "" ]; then
+	if [ "$(git diff --stat package/translate)" != "" ]; then
 		echo "[build] Changed detected. Cancelling build."
 		git diff --stat .
 		exit 1
@@ -55,6 +55,14 @@ fi
 
 
 ### *.plasmoid
+
+if ! type "zip" > /dev/null; then
+	echo "[error] 'zip' command not found."
+	if ! type "zypper" > /dev/null; then
+		echo "[OpenSUSE] Please run: sudo zypper install zip"
+	fi
+	exit 1
+fi
 filename="${packageName}-v${packageVersion}${filenameTag}.${packageExt}"
 rm ${packageName}-v*.${packageExt} # Cleanup
 (cd package \
