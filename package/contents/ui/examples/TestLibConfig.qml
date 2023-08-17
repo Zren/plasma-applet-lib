@@ -173,12 +173,47 @@ Kirigami.FormLayout {
 		configKey: 'testTextAlign'
 		Kirigami.FormData.label: i18n("TextAlign")
 	}
+	LibConfig.VertAlign {
+		configKey: 'testVertAlign'
+		Kirigami.FormData.label: i18n("VertAlign")
+	}
 	LibConfig.TextFormat {
 		boldConfigKey: 'testTextBold'
 		italicConfigKey: 'testTextItalic'
 		underlineConfigKey: 'testTextUnderline'
 		alignConfigKey: 'testTextAlign'
-		Kirigami.FormData.label: i18n("TextFormat")
+		vertAlignConfigKey: 'testVertAlign'
+		Kirigami.FormData.label: i18n("TextFormat (All)")
+	}
+	LibConfig.TextFormat {
+		boldConfigKey: 'testTextBold'
+		italicConfigKey: 'testTextItalic'
+		underlineConfigKey: 'testTextUnderline'
+		alignConfigKey: 'testTextAlign'
+		// vertAlignConfigKey: 'testVertAlign'
+		Kirigami.FormData.label: i18n("TextFormat (BIU+Horz)")
+	}
+	LibConfig.TextFormat {
+		boldConfigKey: 'testTextBold'
+		italicConfigKey: 'testTextItalic'
+		underlineConfigKey: 'testTextUnderline'
+		// alignConfigKey: 'testTextAlign'
+		vertAlignConfigKey: 'testVertAlign'
+		Kirigami.FormData.label: i18n("TextFormat (BIU+Vert)")
+	}
+	LibConfig.TextFormat {
+		boldConfigKey: 'testTextBold'
+		italicConfigKey: 'testTextItalic'
+		underlineConfigKey: 'testTextUnderline'
+		Kirigami.FormData.label: i18n("TextFormat (BIU)")
+	}
+	LibConfig.TextFormat {
+		alignConfigKey: 'testTextAlign'
+		Kirigami.FormData.label: i18n("TextFormat (Horz)")
+	}
+	LibConfig.TextFormat {
+		vertAlignConfigKey: 'testVertAlign'
+		Kirigami.FormData.label: i18n("TextFormat (Vert)")
 	}
 
 

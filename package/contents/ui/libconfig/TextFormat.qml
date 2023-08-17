@@ -1,4 +1,4 @@
-// Version 2
+// Version 3
 
 import QtQuick 2.0
 import QtQuick.Controls 2.0 as QQC2
@@ -14,6 +14,7 @@ RowLayout {
 	property alias italicConfigKey: configItalic.configKey
 	property alias underlineConfigKey: configUnderline.configKey
 	property alias alignConfigKey: configTextAlign.configKey
+	property alias vertAlignConfigKey: configVertAlign.configKey
 
 	QQC2.Button {
 		id: configBold
@@ -48,12 +49,24 @@ RowLayout {
 	Item {
 		implicitWidth: Kirigami.Units.smallSpacing
 		readonly property bool groupBeforeVisible: configBold.visible || configItalic.visible || configUnderline.visible
-		readonly property bool groupAfterVisible: configTextAlign.visible
+		readonly property bool groupAfterVisible: configTextAlign.visible || configVertAlign.visible
 		visible: groupBeforeVisible && groupAfterVisible
 	}
 
 	LibConfig.TextAlign {
 		id: configTextAlign
+		visible: configKey
+	}
+
+	Item {
+		implicitWidth: Kirigami.Units.smallSpacing
+		readonly property bool groupBeforeVisible: configBold.visible || configItalic.visible || configUnderline.visible || configTextAlign.visible
+		readonly property bool groupAfterVisible: configTextAlign.visible
+		visible: groupBeforeVisible && groupAfterVisible
+	}
+
+	LibConfig.VertAlign {
+		id: configVertAlign
 		visible: configKey
 	}
 }
