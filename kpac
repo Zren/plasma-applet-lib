@@ -56,13 +56,47 @@ class LineReplace:
 		self.output = ''
 	def __enter__(self):
 		with open(self.filepath, 'r') as fin:
-			self.lines = self.readlines()
+			self.lines = fin.readlines()
 		return self
 	def __exit__(self, exc_type, exc_val, exc_tb):
 		with open(self.filepath, 'w') as fout:
 			fout.write(self.output)
 	def write(self, text):
 		self.output += text
+
+#---
+def grep_line(matchStr, filepath):
+	with open(filepath, 'r') as fin:
+		for line in fin.read().splitlines():
+			if matchStr in line:
+				return line
+def grep_all(matchStr, filepath):
+	with open(filepath, 'r') as fin:
+		for line in fin.read().splitlines():
+			if matchStr in line:
+				yield line
+
+# sed -i 's/aaa/bbb/' filepath
+def sed_str(a, b, filepath):
+	with LineReplace(filepath) as rep:
+		for line in rep.lines:
+			line = line.replace(a, b)
+			rep.write(line)
+def sed_re(a, b, filepath):
+	with LineReplace(filepath) as rep:
+		for line in rep.lines:
+			line = re.sub(a, b, line)
+			rep.write(line)
+
+def diff(aFilepath, bFilepath):
+	p = subprocess.run([
+		'diff',
+		oldTemplatePath,
+		newTemplatePath,
+	], capture_output=True)
+	return p.stdout.decode('utf-8')
+def is_diff(aFilepath, bFilepath):
+	return diff(aFilepath, bFilepath).strip() != ""
 
 
 #--- Parse metadata as global variables
@@ -75,8 +109,8 @@ if os.path.exists(jsonMetaFilepath):
 		packageNamespace = metadata['KPlugin']['Id']
 		packageName = packageNamespace.split('.')[-1]
 		packageVersion = metadata['KPlugin']['Version']
-		packageAuthor = metadata['KPlugin']['Authors']['Name']
-		packageAuthorEmail = metadata['KPlugin']['Authors']['Email']
+		packageAuthor = metadata['KPlugin']['Authors'][0]['Name']
+		packageAuthorEmail = metadata['KPlugin']['Authors'][0]['Email']
 		packageWebsite = metadata['KPlugin']['Website']
 		packageComment = metadata['KPlugin']['Description']
 elif os.path.exists(desktopMetaFilepath):
@@ -253,17 +287,39 @@ def kpac_i18n(args):
 			rep.write(line)
 
 	if os.path.exists(oldTemplatePath):
-		with open()
-		newPotDate = ''
-		oldPotDate = ''
+		# Temporary replace with oldPotDate
+		# Note: We need to rstrip the trailing \n" since it's annoying to escape just the newline.
+		newPotDate = grep_line('POT-Creation-Date:', newTemplatePath).rstrip('\\n\"')
+		oldPotDate = grep_line('POT-Creation-Date:', oldTemplatePath).rstrip('\\n\"')
+		sed_str(newPotDate, oldPotDate, newTemplatePath)
 
-		with LineReplace(newTemplatePath) as rep:
-			for line in rep.lines:
-				line = line.replace(
-					"Content-Type: text\/plain; charset=CHARSET",
-					"Content-Type: text\/plain; charset=UTF-8",
-				)
-				rep.write(line)
+		changes = diff(oldTemplatePath, newTemplatePath)
+		if changes.strip() != "":
+			sed_str(oldPotDate, newPotDate, newTemplatePath) # Revert back to newPotDate
+			os.rename(newTemplatePath, oldTemplatePath)
+
+			addedKeys = []
+			removedKeys = []
+			for line in changes:
+				if "> msgid" in line:
+					addedKeys.append(line.rstrip('\n')[:9])
+				elif "< msgid" in line:
+					removedKeys.append(line.rstrip('\n')[:9])
+
+			print("")
+			print("Added Keys:")
+			for key in addedKeys:
+				print(key)
+			print("")
+			print("Removed Keys:")
+			for key in removedKeys:
+				print(key)
+			print("")
+		else:
+			# No changes
+			os.remove(newTemplatePath)
+
+
 
 	else:
 		# template.pot didn't already exist
