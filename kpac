@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
-#--- User Configurable Variables
-sourceDir = 'package'
+#--- User Configurable Defaults
+# You can use `kpac --dir=package --i18ndir=package/translate`
+# or edit the variables below to always run `kpac` with defaults.
+sourceDirDefault = 'package'
+translateDirDefault = 'package/translate'
 
 
 
@@ -21,7 +24,7 @@ import shutil
 import sys
 
 #---
-__version__ = '2'
+__version__ = '3'
 logger = logging.getLogger('kpac')
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler())
@@ -292,9 +295,9 @@ def applyLocaleToEnv(env, langCode):
 
 
 class KPackage:
-	def __init__(self, sourceDir="package", buildTag=""):
+	def __init__(self, sourceDir="package", translateDir="package/translate", buildTag=""):
 		self.sourceDir = sourceDir
-		self.translateDir = os.path.join(self.sourceDir, "translate")
+		self.translateDir = translateDir
 		self.buildTag = buildTag
 		self.buildFilenameFormat = "{packageName}-v{packageVersion}{buildTag}"
 		self.buildExt = "zip"
@@ -451,7 +454,14 @@ class KPackage:
 
 		# self.translateDir = 'package/translate/'
 		translateRoot = '..' # package/tranlate/ => package/tranlate/../
+
 		bugAddress = self.packageWebsite
+		m = re.search(r'^((https?:\/\/)?github\.com\/([^\/]+)\/([^\/]+))\/?', self.packageWebsite)
+		if m:
+			newBugAddress = m.group(0) + '/issues/new'
+		else:
+			newBugAddress = self.packageWebsite
+
 		if self.packageServiceType == 'Plasma/Applet':
 			translationDomain = "plasma_applet_{}".format(self.packageNamespace)
 		else:
@@ -753,21 +763,71 @@ class KPackage:
 		# Populate ReadMe.md
 		trReadmeFilepath = os.path.join(self.translateDir, 'ReadMe.md')
 		echoGray("[kpac-i18n] Updating {}".format(trReadmeFilepath))
-		# sed -i -E 's`share\/plasma\/plasmoids\/(.+)\/translate`share/plasma/plasmoids/'"${plasmoidName}"'/translate`' ./ReadMe.md
-		# if [[ "$website" == *"github.com"* ]]; then
-		# 	sed -i -E 's`\[new issue\]\(https:\/\/github\.com\/(.+)\/(.+)\/issues\/new\)`[new issue]('"${website}"'/issues/new)`' ./ReadMe.md
-		# fi
-		# sed -i '/^|/ d' ./ReadMe.md
-		# Remove status table from ReadMe
-		print(status)
-		subprocess.call([
-			'sed',
-			'-i',
-			'/^|/ d',
-			trReadmeFilepath,
-		])
-		with open(trReadmeFilepath, 'a') as fout:
-			fout.write(status)
+
+		trReadmeStr=f"""# Translate
+
+## Status
+
+{status}
+
+## New Translations
+
+* Fill out [`template.pot`](template.pot) with your translations then open a [new issue]({newBugAddress}), name the file `spanish.txt`, attach the txt file to the issue (drag and drop).
+
+Or if you know how to make a pull request
+
+* Copy the `template.pot` file and name it your locale's code (Eg: `en`/`de`/`fr`) with the extension `.po`. Then fill out all the `msgstr ""`.
+* Your region's locale code can be found at: https://stackoverflow.com/questions/3191664/list-of-all-locales-and-their-short-codes/28357857#28357857
+
+## Scripts
+
+Zren's `kpac` script can easily run the `gettext` commands for you, parsing the `metadata.json` and filling out any placeholders for you. `kpac` can be [downloaded here](https://github.com/Zren/plasma-applet-lib/blob/master/kpac) and should be placed at `~/Code/plasmoid-widgetname/kpac` to edit translations at `~/Code/plasmoid-widgetname/package/translate/`.
+
+
+* `python3 ./kpac i18n` will parse the `i18n()` calls in the `*.qml` files and write it to the `template.pot` file. Then it will merge any changes into the `*.po` language files. Then it converts the `*.po` files to it's binary `*.mo` version and move it to `contents/locale/...` which will bundle the translations in the `*.plasmoid` without needing the user to manually install them.
+* `python3 ./kpac localetest` will convert the `.po` to the `*.mo` files then run `plasmoidviewer` (part of `plasma-sdk`).
+
+## How it works
+
+Since KDE Frameworks v5.37, translations can be bundled with the zipped `*.plasmoid` file downloaded from the store.
+
+* `xgettext` extracts the messages from the source code into a `template.pot`.
+* Translators copy the `template.pot` to `fr.po` to translate the French language.
+* When the source code is updated, we use `msgmerge` to update the `fr.po` based on the updated `template.pot`.
+* When testing or releasing the widget, we convert the `.po` files to their binary `.mo` form with `msgfmt`.
+
+The binary `.mo` translation files are placed in `package/contents/locale/` so you may want to add `*.mo` to your `.gitignore`.
+
+```
+package/contents/locale/fr/LC_MESSAGES/plasma_applet_{self.packageNamespace}.mo
+```
+
+## Links
+
+* https://develop.kde.org/docs/plasma/widget/translations-i18n/
+* https://l10n.kde.org/stats/gui/trunk-kf5/team/fr/plasma-desktop/
+* https://techbase.kde.org/Development/Tutorials/Localization/i18n_Build_Systems
+* https://api.kde.org/frameworks/ki18n/html/prg_guide.html
+
+> Version 8 of [Zren's i18n scripts](https://github.com/Zren/plasma-applet-lib).
+"""
+		with open(trReadmeFilepath, 'w') as fout:
+			fout.write(trReadmeStr)
+		# sed_re(
+		# 	r'share/plasma/plasmoids/(.+)/translate',
+		# 	'share/plasma/plasmoids/{}/translate'.format(self.packageName),
+		# 	trReadmeFilepath
+		# )
+		# # Remove status table from ReadMe
+		# print(status)
+		# subprocess.call([
+		# 	'sed',
+		# 	'-i',
+		# 	'/^|/ d',
+		# 	trReadmeFilepath,
+		# ])
+		# with open(trReadmeFilepath, 'a') as fout:
+		# 	fout.write(status)
 
 		echoGreen("[kpac-i18n] Done merge script")
 
@@ -932,6 +992,11 @@ def main():
 		prog='kpac',
 		description='v{} - Misc tools for a plasma widget like kpackages.'.format(__version__),
 	)
+	parser.add_argument('--dir', default=sourceDirDefault,
+		help=f'Path to the folder containing metadata.json (Eg: {sourceDirDefault})')
+	parser.add_argument('--i18ndir', default=translateDirDefault,
+		help=f'Path to the folder containing template.pot (Eg: {translateDirDefault})')
+
 	subparsers = parser.add_subparsers()
 
 	parser_install = subparsers.add_parser('install', help='kpac install')
@@ -959,9 +1024,9 @@ def main():
 	parser_build.set_defaults(func=kpac_build)
 	parser_build.add_argument('--dryrun', action='store_true', default=False)
 
-	kpackage = KPackage(sourceDir)
-
 	args = parser.parse_args()
+
+	kpackage = KPackage(sourceDir=args.dir, translateDir=args.i18ndir)
 
 	if 'func' in args:
 		try:
