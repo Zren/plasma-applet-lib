@@ -416,11 +416,18 @@ class KPackage:
 	):
 		if env is None:
 			env = os.environ.copy()
+
 		if langCode is not None:
 			env = applyLocaleToEnv(env, langCode)
 			self.i18nBuild()
+
 		if dpi != 1:
 			env['QT_DEVICE_PIXEL_RATIO'] = str(dpi)
+
+		# https://invent.kde.org/plasma/libplasma/-/commit/386c5539c6833867112aba299380df3ac48cd47c
+		noContextProps = False
+		if noContextProps:
+			env['PLASMA_NO_CONTEXTPROPERTIES'] = '1'
 
 		procArgs = list(args)
 		for key, value in kwargs.items():
