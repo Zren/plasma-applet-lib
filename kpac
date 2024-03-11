@@ -152,6 +152,7 @@ def is_diff(aFilepath, bFilepath):
 	return diff(aFilepath, bFilepath).strip() != ""
 
 
+
 #---
 @functools.cache
 def kpackagetool():
@@ -991,12 +992,20 @@ package/contents/locale/fr/LC_MESSAGES/plasma_applet_{self.packageNamespace}.mo
 			dry_run=dryrun,
 			logger=zipLogger,
 		)
-		if not dryrun:
+		if not dryrun and self.buildExt != 'zip':
+			echoGray('[kpac-build] renaming .zip to .{}'.format(self.buildExt))
 			os.rename(buildFilename + '.zip', buildFilenameExt)
 
 		# Checksums
-		# echo "[plasmoid] md5: $(md5sum $filename | awk '{ print $1 }')"
-		# echo "[plasmoid] sha256: $(sha256sum $filename | awk '{ print $1 }')"
+		if isCommandInstalled('md5sum'):
+			p = subprocess.run(['md5sum', buildFilenameExt], capture_output=True)
+			tokens = p.stdout.decode('utf-8').split(' ')
+			echoGray('[kpac-build] md5: {}'.format(tokens[0]))
+
+		if isCommandInstalled('sha256sum'):
+			p = subprocess.run(['sha256sum', buildFilenameExt], capture_output=True)
+			tokens = p.stdout.decode('utf-8').split(' ')
+			echoGray('[kpac-build] sha256: {}'.format(tokens[0]))
 
 
 #---
