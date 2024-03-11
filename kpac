@@ -66,6 +66,8 @@ def echoRed(*args):
 	echoTC(TC.FG_LightRed, *args)
 def echoGreen(*args):
 	echoTC(TC.FG_LightGreen, *args)
+def echoWarning(*args):
+	echoTC(TC.FG_Orange, *args)
 def echoError(*args):
 	echoTC(TC.FG_LightRed + TC.Bold, *args)
 
@@ -318,11 +320,11 @@ class KPackage:
 				metadata = json.load(fin)
 				self.packageServiceType = metadata.get('KPackageStructure')
 				if self.packageServiceType is None:
-					print("[warning] metadata.json needs KPackageStructure set in Plasma6")
-					# desktoptojson can 
+					# desktoptojson will port X-KDE-ServiceTypes to KPlugin.ServiceTypes[0] by default
+					echoWarning("[warning] metadata.json needs KPackageStructure set in Plasma6")
 					self.packageServiceType = (metadata.get('KPlugin', {}).get('ServiceTypes', []) + [None])[0]
 				if self.packageServiceType is None:
-					print("[error] metadata.json is missing KPackageStructure, and can't fallback to ServiceTypes either.")
+					echoError("[error] metadata.json is missing KPackageStructure, and can't fallback to ServiceTypes either.")
 					sys.exit(1)
 				self.packageNamespace = metadata.get('KPlugin', {})['Id']
 				self.packageName = self.packageNamespace.split('.')[-1]
@@ -343,7 +345,7 @@ class KPackage:
 			self.packageWebsite = metadata.get('Desktop Entry', 'X-KDE-PluginInfo-Website')
 			self.packageComment = metadata.get('Desktop Entry', 'Comment')
 		else:
-			print("Could not find metadata.json or metadata.desktop in '{}'".format(sourceDir))
+			echoError("Could not find metadata.json or metadata.desktop in '{}'".format(sourceDir))
 			sys.exit(1)
 
 		if self.packageServiceType == "Plasma/Applet":
@@ -414,7 +416,7 @@ class KPackage:
 			env = os.environ.copy()
 		if langCode is not None:
 			env = applyLocaleToEnv(env, langCode)
-			# TODO Build .mo files
+			self.i18nBuild()
 		if dpi != 1:
 			env['QT_DEVICE_PIXEL_RATIO'] = str(dpi)
 
@@ -453,32 +455,52 @@ class KPackage:
 			**kwargs
 		)
 
+	@property
+	def translationDomain(self):
+		if self.packageServiceType == 'Plasma/Applet':
+			return "plasma_applet_{}".format(self.packageNamespace)
+		else:
+			echoError("[kpac-i18n] TODO: Map translationDomain for '{}' ServiceType".format(self.packageServiceType))
+			sys.exit(1)
+
+	@property
+	def bugAddress(self):
+		return self.packageWebsite
+
+	@property
+	def newBugAddress(self):
+		m = re.search(r'^((https?:\/\/)?github\.com\/([^\/]+)\/([^\/]+))\/?', self.packageWebsite)
+		if m:
+			return m.group(0) + '/issues/new'
+		else:
+			return self.packageWebsite
+
+	@property
+	def translateRoot(self):
+		# package/tranlate/ => package/tranlate/../
+		# tranlate/ => tranlate/../package/
+		return os.path.relpath(self.sourceDir, self.translateDir) # Usually '..' or '../package'
+
 	#---
+	def checkI18nCommand(self, cmd):
+		if not isCommandInstalled(cmd):
+			echoError("[kpac-i18n] Error: {} command not found. Need to install gettext.".format(cmd))
+			echoError("[kpac-i18n] Run 'sudo apt install gettext' (Kubuntu/KDE Neon)")
+			echoError("[kpac-i18n] Run 'sudo zypper install gettext-tools' (openSUSE)")
+			sys.exit(1)
+
+
 	def i18nMerge(self):
 		# https://techbase.kde.org/Development/Tutorials/Localization/i18n_Build_Systems
 		# https://techbase.kde.org/Development/Tutorials/Localization/i18n_Build_Systems/Outside_KDE_repositories
 		# https://invent.kde.org/sysadmin/l10n-scripty/-/blob/master/extract-messages.sh
 
+		# self.bugAddress = 'https://github.com/User/plasmoid-widgetname'
+		# self.newBugAddress = 'https://github.com/User/plasmoid-widgetname/issues/new'
 		# self.translateDir = 'package/translate/'
-		translateRoot = '..' # package/tranlate/ => package/tranlate/../
+		# self.translateRoot = '..'
 
-		bugAddress = self.packageWebsite
-		m = re.search(r'^((https?:\/\/)?github\.com\/([^\/]+)\/([^\/]+))\/?', self.packageWebsite)
-		if m:
-			newBugAddress = m.group(0) + '/issues/new'
-		else:
-			newBugAddress = self.packageWebsite
-
-		if self.packageServiceType == 'Plasma/Applet':
-			translationDomain = "plasma_applet_{}".format(self.packageNamespace)
-		else:
-			echoError("[kpac-i18n] TODO: Map translationDomain for '{}' ServiceType".format(self.packageServiceType))
-			sys.exit(1)
-
-		if not isCommandInstalled('xgettext'):
-			echoError("[kpac-i18n] Error: xgettext command not found. Need to install gettext")
-			echoError("[kpac-i18n] Run 'sudo apt install gettext' on Kubuntu/KDE Neon first")
-			sys.exit(1)
+		self.checkI18nCommand('xgettext')
 
 		echoGray("[kpac-i18n] " + TC.Bold + "[Extracting messages]")
 		potArgs = [
@@ -501,7 +523,7 @@ class KPackage:
 		with open(infilesPath, 'w') as fout:
 			findProc = subprocess.Popen([
 				'find',
-				translateRoot,
+				self.translateRoot,
 				'-name', '*.cpp',
 				'-o', '-name', '*.h',
 				'-o', '-name', '*.c',
@@ -547,10 +569,10 @@ class KPackage:
 			'-kN_:1',
 			'-kaliasLocale',
 			'--package-name', self.packageName,
-			'--msgid-bugs-address', bugAddress,
+			'--msgid-bugs-address', self.bugAddress,
 		]
 		returncode = subprocess.call(['xgettext'] + potArgs + [
-			'-D', translateRoot,
+			'-D', self.translateRoot,
 			'-D', '.', # cwd should be translateDir
 			'-o', newTemplateFilename,
 		], cwd=self.translateDir)
@@ -704,9 +726,8 @@ class KPackage:
 				"{}%".format(poCompletion),
 			)
 
-			# backupCatFilepath = catFilepath + '.old'
-			# os.rename(catFilepath, backupCatFilepath)
-			# os.rename(newCatFilepath, catFilepath)
+			# os.rename(catFilepath, catFilepath + '.old') # Backup
+			os.rename(newCatFilepath, catFilepath)
 
 		echoGray("[kpac-i18n] Done merging messages")
 
@@ -779,7 +800,7 @@ class KPackage:
 
 ## New Translations
 
-* Fill out [`template.pot`](template.pot) with your translations then open a [new issue]({newBugAddress}), name the file `spanish.txt`, attach the txt file to the issue (drag and drop).
+* Fill out [`template.pot`](template.pot) with your translations then open a [new issue]({self.newBugAddress}), name the file `spanish.txt`, attach the txt file to the issue (drag and drop).
 
 Or if you know how to make a pull request
 
@@ -820,108 +841,40 @@ package/contents/locale/fr/LC_MESSAGES/plasma_applet_{self.packageNamespace}.mo
 """
 		with open(trReadmeFilepath, 'w') as fout:
 			fout.write(trReadmeStr)
-		# sed_re(
-		# 	r'share/plasma/plasmoids/(.+)/translate',
-		# 	'share/plasma/plasmoids/{}/translate'.format(self.packageName),
-		# 	trReadmeFilepath
-		# )
-		# # Remove status table from ReadMe
-		# print(status)
-		# subprocess.call([
-		# 	'sed',
-		# 	'-i',
-		# 	'/^|/ d',
-		# 	trReadmeFilepath,
-		# ])
-		# with open(trReadmeFilepath, 'a') as fout:
-		# 	fout.write(status)
 
 		echoGreen("[kpac-i18n] Done merge script")
 
 
 	def i18nBuild(self):
-		pass
+		# This script will convert the *.po files to *.mo files, rebuilding the package/contents/locale folder.
+		# Feature discussion: https://phabricator.kde.org/D5209
+		# Eg: contents/locale/fr_CA/LC_MESSAGES/plasma_applet_org.kde.plasma.eventcalendar.mo
 
-		#--- TODO ---------------------------------
-		#!/bin/sh
-		# # Version: 7
+		self.checkI18nCommand('msgfmt')
 
-		# # This script will convert the *.po files to *.mo files, rebuilding the package/contents/locale folder.
-		# # Feature discussion: https://phabricator.kde.org/D5209
-		# # Eg: contents/locale/fr_CA/LC_MESSAGES/plasma_applet_org.kde.plasma.eventcalendar.mo
+		echoGray("[kpac-i18n] " + TC.Bold + "[Compiling messages]")
 
-		# DIR=`cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd`
-		# plasmoidName=`kreadconfig5 --file="$DIR/../metadata.desktop" --group="Desktop Entry" --key="X-KDE-PluginInfo-Name"`
-		# website=`kreadconfig5 --file="$DIR/../metadata.desktop" --group="Desktop Entry" --key="X-KDE-PluginInfo-Website"`
-		# bugAddress="$website"
-		# packageRoot="${DIR}/.." # Root of translatable sources
-		# projectName="plasma_applet_${plasmoidName}" # project name
+		for catFilepath in glob.glob(os.path.join(self.translateDir, '*.po')):
+			catFilename = os.path.basename(catFilepath)
+			catLocale = os.path.splitext(catFilename)[0]
+			moFilename = f"{catLocale}.mo"
+			installDir = os.path.join(self.sourceDir, 'contents', 'locale', catLocale, 'LC_MESSAGES')
+			installFilepath = os.path.join(installDir, self.translationDomain + '.mo')
+			relativeInstallPath = os.path.relpath(installFilepath, self.translateDir)
+			echoGray(f"[kpac-i18n] Converting '{catFilename}' => '{relativeInstallPath}")
 
-		# ### Colors
-		# # https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
-		# # https://stackoverflow.com/questions/911168/how-can-i-detect-if-my-shell-script-is-running-through-a-pipe
-		# TC_Red='\033[31m'; TC_Orange='\033[33m';
-		# TC_LightGray='\033[90m'; TC_LightRed='\033[91m'; TC_LightGreen='\033[92m'; TC_Yellow='\033[93m'; TC_LightBlue='\033[94m';
-		# TC_Reset='\033[0m'; TC_Bold='\033[1m';
-		# if [ ! -t 1 ]; then
-		# 	TC_Red=''; TC_Orange='';
-		# 	TC_LightGray=''; TC_LightRed=''; TC_LightGreen=''; TC_Yellow=''; TC_LightBlue='';
-		# 	TC_Bold=''; TC_Reset='';
-		# fi
-		# function echoTC() {
-		# 	text="$1"
-		# 	textColor="$2"
-		# 	echo -e "${textColor}${text}${TC_Reset}"
-		# }
-		# function echoGray { echoTC "$1" "$TC_LightGray"; }
-		# function echoRed { echoTC "$1" "$TC_Red"; }
-		# function echoGreen { echoTC "$1" "$TC_LightGreen"; }
+			os.makedirs(installDir, exist_ok=True)
 
-		# #---
-		# if [ -z "$plasmoidName" ]; then
-		# 	echoRed "[translate/build] Error: Couldn't read plasmoidName."
-		# 	exit
-		# fi
+			returncode = subprocess.call([
+				'msgfmt',
+				'-o', relativeInstallPath,
+				catFilename,
+			], cwd=self.translateDir)
+			if returncode != 0:
+				echoError("[kpac-i18n] error while calling msgfmt. aborting.")
+				sys.exit(1)
 
-		# if [ -z "$(which msgfmt)" ]; then
-		# 	echoRed "[translate/build] Error: msgfmt command not found. Need to install gettext"
-		# 	echoRed "[translate/build] Running ${TC_Bold}'sudo apt install gettext'"
-		# 	sudo apt install gettext
-		# 	echoRed "[translate/build] gettext installation should be finished. Going back to installing translations."
-		# fi
-
-		# #---
-		# echoGray "[translate/build] Compiling messages"
-
-		# function relativePath() {
-		# 	basePath=`realpath -- "$1"`
-		# 	longerPath=`realpath -- "$2"`
-		# 	echo "${longerPath#${basePath}*}"
-		# }
-		# catalogs=`find . -name '*.po' | sort`
-		# for cat in $catalogs; do
-		# 	catLocale=`basename ${cat%.*}`
-		# 	moFilename="${catLocale}.mo"
-		# 	installPath="${packageRoot}/contents/locale/${catLocale}/LC_MESSAGES/${projectName}.mo"
-		# 	installPath=`realpath -- "$installPath"`
-		# 	relativeInstallPath=`relativePath "${packageRoot}" "${installPath}"`
-		# 	relativeInstallPath="${relativeInstallPath#/*}"
-		# 	echoGray "[translate/build] Converting '${cat}' => '${relativeInstallPath}'"
-		# 	msgfmt -o "${moFilename}" "${cat}"
-		# 	mkdir -p "$(dirname "$installPath")"
-		# 	mv "${moFilename}" "${installPath}"
-		# done
-
-		# echoGreen "[translate/build] Done building messages"
-
-		# if [ "$1" = "--restartplasma" ]; then
-		# 	echo "[translate/build] ${TC_Bold}Restarting plasmashell${TC_Reset}"
-		# 	killall plasmashell
-		# 	kstart5 plasmashell
-		# 	echo "[translate/build] Done restarting plasmashell"
-		# else
-		# 	echo "[translate/build] (re)install the plasmoid and restart plasmashell to test translations."
-		# fi
+		echoGreen("[kpac-i18n] Done compiling messages")
 
 
 	#---
@@ -972,21 +925,20 @@ def kpac_uninstall(kpackage, args):
 
 def kpac_i18n(kpackage, args):
 	kpackage.i18nMerge()
+	kpackage.i18nBuild()
 
 def kpac_test(kpackage, args):
 	if args.vertical:
-		kpackage.testVertical()
+		kpackage.testVertical(dpi=args.dpi)
 	elif args.panel:
-		kpackage.testHorizontal()
+		kpackage.testHorizontal(dpi=args.dpi)
 	elif args.desktop:
-		kpackage.testDesktop()
-	elif args.dpi != 1:
-		kpackage.test(dpi=args.dpi)
+		kpackage.testDesktop(dpi=args.dpi)
 	else:
-		kpackage.test()
+		kpackage.test(dpi=args.dpi)
 
 def kpac_localetest(kpackage, args):
-	kpackage.testLocale(args.langcode)
+	kpackage.test(langCode=args.langcode)
 
 
 def kpac_build(kpackage, args):
