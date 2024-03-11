@@ -5,6 +5,10 @@
 # or edit the variables below to always run `kpac` with defaults.
 sourceDirDefault = 'package'
 translateDirDefault = 'package/translate'
+qtMinVer="6.0"
+kfMinVer="6.0"
+plasmaMinVer="6.0"
+filenameTag=f"plasma{plasmaMinVer.replace('.', '_')}"
 
 
 
@@ -298,7 +302,10 @@ class KPackage:
 	def __init__(self, sourceDir="package", translateDir="package/translate", buildTag=""):
 		self.sourceDir = sourceDir
 		self.translateDir = translateDir
-		self.buildTag = buildTag
+		if len(buildTag) >= 1:
+			self.buildTag = '-' + buildTag
+		else:
+			self.buildTag = ''
 		self.buildFilenameFormat = "{packageName}-v{packageVersion}{buildTag}"
 		self.buildExt = "zip"
 
@@ -932,7 +939,7 @@ package/contents/locale/fr/LC_MESSAGES/plasma_applet_{self.packageNamespace}.mo
 		logger.info("")
 
 		# Cleanup
-		oldPackageList = glob.glob('*.' + buildExt)
+		oldPackageList = glob.glob('*.' + self.buildExt)
 		for oldPackage in oldPackageList:
 			print("DELETED: {}".format(oldPackage))
 			if not dryrun:
@@ -942,7 +949,7 @@ package/contents/locale/fr/LC_MESSAGES/plasma_applet_{self.packageNamespace}.mo
 		zipLogger = logging.getLogger('build')
 		zipLogger.setLevel(logging.DEBUG)
 		zipLogger.addHandler(logging.StreamHandler())
-		shutil.make_archive(buildFilename, 'zip', sourceDir,
+		shutil.make_archive(buildFilename, 'zip', self.sourceDir,
 			dry_run=dryrun,
 			logger=zipLogger,
 		)
@@ -992,10 +999,10 @@ def main():
 		prog='kpac',
 		description='v{} - Misc tools for a plasma widget like kpackages.'.format(__version__),
 	)
-	parser.add_argument('--dir', default=sourceDirDefault,
-		help=f'Path to the folder containing metadata.json (Eg: {sourceDirDefault})')
-	parser.add_argument('--i18ndir', default=translateDirDefault,
-		help=f'Path to the folder containing template.pot (Eg: {translateDirDefault})')
+	parser.add_argument('--dir', default=sourceDirDefault, metavar=sourceDirDefault,
+		help=f'Path to the folder containing metadata.json')
+	parser.add_argument('--i18ndir', default=translateDirDefault, metavar=translateDirDefault,
+		help=f'Path to the folder containing template.pot')
 
 	subparsers = parser.add_subparsers()
 
@@ -1023,10 +1030,15 @@ def main():
 	parser_build = subparsers.add_parser('build', help='kpac build')
 	parser_build.set_defaults(func=kpac_build)
 	parser_build.add_argument('--dryrun', action='store_true', default=False)
+	parser_build.add_argument('--tag', dest='buildTag', default=filenameTag)
 
 	args = parser.parse_args()
 
-	kpackage = KPackage(sourceDir=args.dir, translateDir=args.i18ndir)
+	kpackage = KPackage(
+		sourceDir=args.dir,
+		translateDir=args.i18ndir,
+		buildTag=args.buildTag if hasattr(args, 'buildTag') else filenameTag,
+	)
 
 	if 'func' in args:
 		try:
