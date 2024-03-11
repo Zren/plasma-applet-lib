@@ -310,13 +310,15 @@ class KPackage:
 			self.buildTag = ''
 		self.buildFilenameFormat = "{packageName}-v{packageVersion}{buildTag}"
 		self.buildExt = "zip"
+		self.parseMetadata()
 
+	def parseMetadata(self):
 		#--- Parse metadata as global variables
-		jsonMetaFilepath = os.path.join(sourceDir, 'metadata.json')
-		desktopMetaFilepath = os.path.join(sourceDir, 'metadata.desktop')
-		if os.path.exists(jsonMetaFilepath):
+		self.jsonMetaFilepath = os.path.join(self.sourceDir, 'metadata.json')
+		self.desktopMetaFilepath = os.path.join(self.sourceDir, 'metadata.desktop')
+		if os.path.exists(self.jsonMetaFilepath):
 			# .json
-			with open(jsonMetaFilepath, 'r') as fin:
+			with open(self.jsonMetaFilepath, 'r') as fin:
 				metadata = json.load(fin)
 				self.packageServiceType = metadata.get('KPackageStructure')
 				if self.packageServiceType is None:
@@ -333,9 +335,9 @@ class KPackage:
 				self.packageAuthorEmail = (metadata.get('KPlugin', {}).get('Authors', []) + [{'Name': ''}])[0].get('Email', '')
 				self.packageWebsite = metadata.get('KPlugin', {}).get('Website', '')
 				self.packageComment = metadata.get('KPlugin', {}).get('Description', '')
-		elif os.path.exists(desktopMetaFilepath):
+		elif os.path.exists(self.desktopMetaFilepath):
 			# .desktop
-			metadata = KdeConfig(desktopMetaFilepath)
+			metadata = KdeConfig(self.desktopMetaFilepath)
 			self.packageServiceType = metadata.get('Desktop Entry', 'X-KDE-ServiceTypes')
 			self.packageNamespace = metadata.get('Desktop Entry', 'X-KDE-PluginInfo-Name')
 			self.packageName = self.packageNamespace.split('.')[-1]
@@ -345,7 +347,7 @@ class KPackage:
 			self.packageWebsite = metadata.get('Desktop Entry', 'X-KDE-PluginInfo-Website')
 			self.packageComment = metadata.get('Desktop Entry', 'Comment')
 		else:
-			echoError("Could not find metadata.json or metadata.desktop in '{}'".format(sourceDir))
+			echoError("Could not find metadata.json or metadata.desktop in '{}'".format(self.sourceDir))
 			sys.exit(1)
 
 		if self.packageServiceType == "Plasma/Applet":
@@ -876,6 +878,82 @@ package/contents/locale/fr/LC_MESSAGES/plasma_applet_{self.packageNamespace}.mo
 
 		echoGreen("[kpac-i18n] Done compiling messages")
 
+	#---
+	def portToPlasma6(self):
+		if os.path.exists(self.desktopMetaFilepath):
+			if not os.path.exists(self.jsonMetaFilepath):
+				if not isCommandInstalled('desktoptojson'):
+					echoError('[kpac-plasma6] desktoptojson is not installed')
+				returncode = subprocess.call([
+					'desktoptojson',
+					'-i', self.desktopMetaFilepath,
+				])
+				if returncode != 0:
+					echoError("[kpac-plasma6] error while calling desktoptojson")
+					sys.exit(1)
+				# Re-parse KPackage metadata
+				self.parseMetadata()
+
+			echoWarning("[kpac-plasma6] Deleting metadata.desktop")
+			os.remove(self.desktopMetaFilepath)
+
+		echoWarning("[kpac-plasma6] Porting metadata.json")
+		with open(self.jsonMetaFilepath, 'r') as fin:
+			metadata = json.load(fin)
+
+		from pprint import pprint
+		pprint(metadata)
+
+		if 'X-Plasma-API-Minimum-Version' not in metadata:
+			metadata['X-Plasma-API-Minimum-Version'] = '6.0'
+			print('Set X-Plasma-API-Minimum-Version = 6.0')
+
+		if metadata['X-Plasma-API-Minimum-Version'] == '6.0':
+			# https://invent.kde.org/plasma/plasma-desktop/-/commit/9d34b1853378dd2167e996ffe6706b35b7343439
+			if metadata.get('KPackageStructure') is None:
+				if len(metadata.get('KPlugin', {}).get('ServiceTypes', [])) >= 1:
+					serviceType = metadata['KPlugin']['ServiceTypes'][0]
+					metadata['KPackageStructure'] = serviceType
+					print("The KPackageStructure metadata key was populated with KPlugin.ServiceTypes[0]={}".format(serviceType))
+				del metadata['KPlugin']['ServiceTypes']
+				print("The KPlugin.ServiceTypes metadata key was deleted.")
+
+			# https://invent.kde.org/plasma/plasma-desktop/-/commit/d016cae56387ee481a68c11d12e76e3bb0fd3999
+			# https://invent.kde.org/plasma/libplasma/-/merge_requests/906
+			if 'X-Plasma-API' in metadata:
+				del metadata['X-Plasma-API']
+				print("The X-Plasma-API metadata key was deleted.")
+
+			# https://invent.kde.org/plasma/plasma-desktop/-/commit/866e815eb2829a99bd0382bb399efbb30ce53100
+			if 'X-Plasma-MainScript' in metadata:
+				print("X-Plasma-MainScript={} has been deprecated.".format(metadata['X-Plasma-MainScript']))
+				oldMainScript = os.path.join(self.sourceDir, "contents", metadata['X-Plasma-MainScript'])
+				newMainScript = os.path.join(self.sourceDir, "contents", "ui", "main.qml")
+				if os.path.exists(oldMainScript):
+					if oldMainScript == newMainScript:
+						echoGray("MainScript is already ui/main.qml so will just delete.")
+					elif os.path.exists(newMainScript):
+						echoError("Unable to rename {} to ui/main.qml since the later already exists!".format(oldMainScript))
+						sys.exit(1)
+					else:
+						print("X-Plasma-MainScript={} will be renamed to the default ui/main.qml".format(metadata['X-Plasma-MainScript']))
+						shutil.mv(oldMainScript, newMainScript)
+				else:
+					echoError("Unable to rename {} to ui/main.qml since it doesn't exist!".format(oldMainScript))
+					sys.exit(1)
+
+				del metadata['X-Plasma-MainScript']
+				print("The X-Plasma-MainScript metadata key was deleted.")
+
+		pprint(metadata)
+
+		with open(self.jsonMetaFilepath, 'w') as fout:
+			metadata = json.dump(metadata, fout,
+				ensure_ascii=False,
+				indent='\t',
+				sort_keys=True,
+			)
+
 
 	#---
 	def buildZip(self, dryrun=False):
@@ -946,6 +1024,10 @@ def kpac_build(kpackage, args):
 		dryrun=args.dryrun
 	)
 
+def kpac_plasma6(kpackage, args):
+	kpackage.portToPlasma6()
+
+
 def main():
 	parser = argparse.ArgumentParser(
 		prog='kpac',
@@ -983,6 +1065,9 @@ def main():
 	parser_build.set_defaults(func=kpac_build)
 	parser_build.add_argument('--dryrun', action='store_true', default=False)
 	parser_build.add_argument('--tag', dest='buildTag', default=filenameTag)
+
+	parser_plasma6 = subparsers.add_parser('plasma6', help='kpac plasma6 (Port to Plasma 6)')
+	parser_plasma6.set_defaults(func=kpac_plasma6)
 
 	args = parser.parse_args()
 
