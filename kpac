@@ -519,8 +519,71 @@ class KPackage:
 			'--add-location=file', # Filename only, no line numbers
 		]
 
+		oldTemplateFilename = 'template.pot'
+		newTemplateFilename = 'template.pot.new'
+		oldTemplatePath = os.path.join(self.translateDir, oldTemplateFilename)
+		newTemplatePath = os.path.join(self.translateDir, newTemplateFilename)
+
 		# TODO:
 		# Extract messages from metadata.desktop + metadata.json
+		if os.path.exists(self.jsonMetaFilepath):
+			echoGray("[kpac-i18n] Extracting metadata.json")
+			with open(self.jsonMetaFilepath, 'r') as fin:
+				metadata = json.load(fin)
+			# This template header is overwritten later so the only changes needed is
+			# 'charset=CHARSET' => 'charset=UTF-8' so that xgettext doesn't complain.
+			newTemplateText="""# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\\n"
+"Report-Msgid-Bugs-To: \\n"
+"POT-Creation-Date: 2000-12-31 23:59-0000\\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n"
+"Language-Team: LANGUAGE <LL@li.org>\\n"
+"Language: \\n"
+"MIME-Version: 1.0\\n"
+"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Transfer-Encoding: 8bit\\n"
+
+"""
+			kp = metadata.get('KPlugin', {})
+			trKeywords = [
+				'Name',
+				'Description',
+			]
+			relativeMetadataPath = os.path.relpath(self.jsonMetaFilepath, self.translateDir)
+			for keyword in trKeywords:
+				keywordMessage = kp.get(keyword, '')
+				keywordMessage = keywordMessage.replace('\"', r'\"')
+				if keyword != "":
+					keywordText=f"#: {relativeMetadataPath}\nmsgid \"{keyword}\"\nmsgstr \"{keywordMessage}\"\n\n"
+					newTemplateText += keywordText
+			with open(newTemplatePath, 'w') as fout:
+				fout.write(newTemplateText)
+		else:
+			# TODO: Port parsing Desktop File
+			# Note: xgettext v0.20.1 (Kubuntu 20.04) and below will attempt to translate Icon,
+			# so we need to specify Name, GenericName, Comment, and Keywords.
+			# https://github.com/Zren/plasma-applet-lib/issues/1
+			# https://savannah.gnu.org/support/?108887
+			# find "${packageRoot}" -name '*.desktop' | sort > "${DIR}/infiles.list"
+			# xgettext \
+			# 	${potArgs} \
+			# 	--files-from="${DIR}/infiles.list" \
+			# 	--language=Desktop \
+			# 	-k -kName -kGenericName -kComment -kKeywords \
+			# 	-D "${packageRoot}" \
+			# 	-D "${DIR}" \
+			# 	-o "template.pot.new" \
+			# 	|| \
+			# 	{ echoRed "[translate/merge] error while calling xgettext. aborting."; exit 1; }
+			pass
 
 
 		# See Ki18n's extract-messages.sh for a full example:
@@ -545,10 +608,6 @@ class KPackage:
 			], stdin=findProc.stdout, stdout=fout)
 			findProc.wait()
 
-		oldTemplateFilename = 'template.pot'
-		newTemplateFilename = 'template.pot.new'
-		oldTemplatePath = os.path.join(self.translateDir, oldTemplateFilename)
-		newTemplatePath = os.path.join(self.translateDir, newTemplateFilename)
 		potArgs += [
 			# '--files-from', infilesPath,
 			'--files-from', 'infiles.list',
@@ -584,6 +643,7 @@ class KPackage:
 		returncode = subprocess.call(['xgettext'] + potArgs + [
 			'-D', self.translateRoot,
 			'-D', '.', # cwd should be translateDir
+			'--join-existing',
 			'-o', newTemplateFilename,
 		], cwd=self.translateDir)
 		if returncode != 0:
