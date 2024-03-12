@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-__version__ = '7'
+__version__ = '8'
 
 #--- User Configurable Defaults
 # You can use `kpac --dir=package --i18ndir=package/translate`
@@ -174,6 +174,9 @@ class LineReplace:
 			self.lines = fin.readlines()
 		return self
 	def __exit__(self, exc_type, exc_val, exc_tb):
+		if exc_type is not None:
+			print(f"Did not write {self.filepath} due to error")
+			return # Skip writing to file if there's an error.
 		with open(self.filepath, 'w') as fout:
 			fout.write(self.output)
 	def write(self, text):
@@ -228,7 +231,10 @@ def diff(aFilepath, bFilepath):
 def is_diff(aFilepath, bFilepath):
 	return diff(aFilepath, bFilepath).strip() != ""
 
-
+# git_diff --color filepath
+def git_diff_color(filepath):
+	p = subprocess.run(['git', 'diff', '--color', filepath], capture_output=True)
+	return p.stdout.decode('utf-8')
 
 #---
 @functools.cache
@@ -1065,8 +1071,6 @@ package/contents/locale/fr/LC_MESSAGES/plasma_applet_{self.packageNamespace}.mo
 		with open(self.jsonMetaFilepath, 'r') as fin:
 			metadata = json.load(fin)
 
-		pprint(metadata)
-
 		if 'X-Plasma-API-Minimum-Version' not in metadata:
 			metadata['X-Plasma-API-Minimum-Version'] = '6.0'
 			print('Set X-Plasma-API-Minimum-Version = 6.0')
@@ -1108,10 +1112,94 @@ package/contents/locale/fr/LC_MESSAGES/plasma_applet_{self.packageNamespace}.mo
 				del metadata['X-Plasma-MainScript']
 				print("The X-Plasma-MainScript metadata key was deleted.")
 
-		pprint(metadata)
-
+		# pprint(metadata)
 		jsonDumpTabbed(self.jsonMetaFilepath, metadata)
 
+		#--- Delete obsolete Zren i18n scripts
+		trBuildPath = os.path.join(self.translateDir, 'build')
+		if os.path.exists(trBuildPath):
+			echoWarning("[kpac-plasma6] Deleting obsolete '{}'. Use: ./kpac i18n".format(trBuildPath))
+		trMergePath = os.path.join(self.translateDir, 'merge')
+		if os.path.exists(trMergePath):
+			echoWarning("[kpac-plasma6] Deleting obsolete '{}'. Use: ./kpac i18n".format(trMergePath))
+		trLocaleTestPath = os.path.join(self.translateDir, 'plasmoidlocaletest')
+		if os.path.exists(trLocaleTestPath):
+			echoWarning("[kpac-plasma6] Deleting obsolete '{}'. Use: ./kpac localetest".format(trLocaleTestPath))
+
+		#--- Replace keywords in QML files
+		echoGray('[kpac-plasma6] ' + TC.Bold + 'Replacing keywords in .qml files')
+		for qmlFilepath in glob.glob(os.path.join(self.sourceDir, '**/*.qml'), recursive=True):
+			self.portFileToPlasma6(qmlFilepath)
+
+
+	def portFileToPlasma6(self, qmlFilepath):
+		echoGray('[kpac-plasma6] ' + qmlFilepath)
+		importPattern = r'^import ([\w+\.]+)( (\d+\.\d+))?( as (\w+))'
+		namespaceVersion = {}
+		namespaceQt6Map = {
+			'QtGraphicalEffects': 'Qt5Compat.GraphicalEffects',
+		}
+		def replaceImport(m):
+			namespace = m.group(1)
+			version = m.group(3)
+			name = m.group(5)
+			namespaceVersion[namespace] = version
+			newNamespace = namespaceQt6Map.get(namespace, namespace)
+			if name is None:
+				return f"import {newNamespace}"
+			else:
+				return f"import {newNamespace} as {name}"
+		def isMajorVersion(namespace, major):
+			if namespace in namespaceVersion:
+				versionStr = namespaceVersion[namespace]
+				if versionStr is None: # Already Ported to Qt6
+					return False
+				else:
+					return versionStr.startsWith('{}.'.format(major))
+			else:
+				return False
+		def replacePlasmaComponents(line, nsVerKeyword, replacement):
+			m = re.search(r'PlasmaComponents(\d+)\.', nsVerKeyword)
+			majorVersion = m.group(1)
+			line = line.replace(nsVerKeyword, replacement)
+			if isMajorVersion('org.kde.plasma.components', majorVersion):
+				nsKeyword = nsVerKeyword.sub(r'PlasmaComponents(\d+)\.', 'PlasmaComponents.')
+				line = line.replace(nsKeyword, replacement)
+			return line
+
+		with LineReplace(qmlFilepath) as rep:
+			for line in rep.lines:
+				# Parse imports to namespaceVersion dict.
+				# Also replace namespaces that changed listed in namespaceQt6Map.
+				line = re.sub(importPattern, replaceImport, line)
+
+				line = line.replace('PlasmaCore.Units.devicePixelRatio', 'Screen.devicePixelRatio')
+
+				line = replacePlasmaComponents(line, 'PlasmaComponents2.Highlight', 'PlasmaExtras.Highlight')
+				line = replacePlasmaComponents(line, 'PlasmaComponents2.MenuItem', 'PlasmaExtras.Menu')
+				line = replacePlasmaComponents(line, 'PlasmaComponents2.ContextMenu', 'PlasmaExtras.Menu')
+				line = replacePlasmaComponents(line, 'PlasmaComponents2.Menu', 'PlasmaExtras.Menu')
+
+				line = line.replace('PlasmaCore.DataSource', 'Plasma5Support.DataSource')
+
+				rep.write(line)
+
+		#--- Add Missing Imports
+		def checkImport(nsKeyword, namespace):
+			usageLine = grep_line(nsKeyword + '.', qmlFilepath)
+			importLine = grep_line('import ' + namespace, qmlFilepath)
+			if usageLine is not None and importLine is None:
+				with open(qmlFilepath, 'r') as fin:
+					qmlText = fin.read()
+				with open(qmlFilepath, 'w') as fout:
+					fout.write(f"import {namepsace} as {nsKeyword}")
+		checkImport('Plasma5Support', 'org.kde.plasma.plasma5support')
+		checkImport('PlasmaExtras', 'org.kde.plasma.extras')
+
+		#--- Show changes
+		diffStr = git_diff_color(qmlFilepath)
+		if diffStr.strip() != "":
+			print(diffStr)
 
 	#---
 	def containsGitChanges(self, path='.'):
