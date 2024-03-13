@@ -1,8 +1,8 @@
-// Version 4
+// Version 5
 
-import QtQuick 2.0
+import QtQuick
 import QtQuick.Controls as QQC2
-import QtQuick.Layouts 1.0
+import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 
 import "." as LibConfig
