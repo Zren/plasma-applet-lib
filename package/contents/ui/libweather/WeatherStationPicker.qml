@@ -1,4 +1,4 @@
-// Version 5
+// Version 6
 // Based On: https://invent.kde.org/plasma/kdeplasma-addons/-/blame/master/applets/weather/package/contents/ui/config/WeatherStationPicker.qml
 
 /*
@@ -31,7 +31,17 @@ ColumnLayout {
 
 		// {"bbcukmet":"BBC Weather|bbcukmet","envcan":"Environment Canada|envcan","noaa":"NOAA's National Weather Service|noaa","wettercom":"wetter.com|wettercom"}
 		readonly property var ions: data['ions']
-		readonly property var ionServiceList: ions ? Object.keys(ions) : []
+		readonly property var ionServiceList: {
+			if (ions) {
+				return Object.keys(ions).map(function(ion){
+					// In Plasma6, all ions are prefixed with plasma_engine_
+					// however we need to use just 'envcan' like in Plasma5.
+					return ion.replace('plasma_engine_', '')
+				})
+			} else {
+				return []
+			}
+		}
 		// onIonsChanged: console.log('ions', JSON.stringify(ions))
 		// onIonServiceListChanged: console.log('ionServiceList', JSON.stringify(ionServiceList))
 	}
@@ -88,7 +98,7 @@ ColumnLayout {
 				searchDelayTimer.restart();
 			}
 
-			Keys.onPressed: {
+			Keys.onPressed: function(event) {
 				if (event.key == Qt.Key_Up) {
 					if (locationListView.currentIndex != 0) {
 						locationListView.currentIndex--;
