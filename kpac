@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-__version__ = '10'
+__version__ = '11'
 
 #--- User Configurable Defaults
 # You can use `kpac --dir=package --i18ndir=package/translate`
@@ -1137,7 +1137,7 @@ package/contents/locale/fr/LC_MESSAGES/plasma_applet_{self.packageNamespace}.mo
 		echoGray('[kpac-plasma6] ' + qmlFilepath)
 
 		#--- Imports and KeywordReplace
-		importPattern = r'^import ([\w+\.]+)( (\d+\.\d+))?( as (\w+))'
+		importPattern = r'^import ([\w+\.]+)( (\d+\.\d+))?( as (\w+))?'
 		namespaceVersion = {}
 		namespaceQt6Map = {
 			'org.kde.kcoreaddons': 'org.kde.coreaddons',
@@ -1309,6 +1309,9 @@ package/contents/locale/fr/LC_MESSAGES/plasma_applet_{self.packageNamespace}.mo
 				line = line.replace('PlasmaCore.SortFilterModel', 'KItemModels.KSortFilterProxyModel')
 
 				line = line.replace('KQuickAddons.IconDialog', 'KIconThemes.IconDialog')
+
+				#--- Qt
+				line = line.replace('RegExpValidator', 'RegularExpressionValidator') # Also { regExp: // } => { regularExpression: // }
 
 				# TODO PlasmaCore.Theme.mSize(font).height	Kirigami.Units.gridUnit
 				# line = replacePlasmaComponents(line, 'PlasmaExtras.Heading', 'Kirigami.Heading') # Not required?
