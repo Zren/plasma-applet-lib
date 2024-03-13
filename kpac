@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-__version__ = '12'
+__version__ = '13'
 
 #--- User Configurable Defaults
 # You can use `kpac --dir=package --i18ndir=package/translate`
@@ -1330,7 +1330,7 @@ package/contents/locale/fr/LC_MESSAGES/plasma_applet_{self.packageNamespace}.mo
 				with open(qmlFilepath, 'r') as fin:
 					qmlText = fin.read()
 				with open(qmlFilepath, 'w') as fout:
-					fout.write(f"import {namespace} as {nsKeyword}")
+					fout.write(f"import {namespace} as {nsKeyword}\n")
 					fout.write(qmlText)
 		checkImport('Plasma5Support', 'org.kde.plasma.plasma5support')
 		checkImport('PlasmaExtras', 'org.kde.plasma.extras')
