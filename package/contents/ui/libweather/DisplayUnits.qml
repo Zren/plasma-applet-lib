@@ -1,6 +1,6 @@
-// Version 1
+// Version 2
 
-import QtQuick 2.0
+import QtQuick
 
 QtObject {
 	id: displayUnits

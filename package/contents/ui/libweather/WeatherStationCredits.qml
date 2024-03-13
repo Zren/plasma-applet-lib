@@ -1,11 +1,10 @@
-// Version 2
+// Version 3
 
-import QtQuick 2.0
-import QtQuick.Controls 2.0 as QQC2
-import QtQuick.Layouts 1.0
-import org.kde.plasma.core 2.0 as PlasmaCore
-
-import org.kde.kirigami 2.3 as Kirigami
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
+import org.kde.plasma.plasma5support as Plasma5Support
 
 Rectangle {
 	id: weatherStationCredits
@@ -31,7 +30,7 @@ Rectangle {
 	readonly property string creditsText: weatherDataSource.getData('Credit')
 	readonly property string creditsUrl: weatherDataSource.getData('Credit Url')
 
-	PlasmaCore.DataSource {
+	Plasma5Support.DataSource {
 		id: weatherDataSource
 		engine: "weather"
 		readonly property string weatherSource: plasmoid.configuration.source

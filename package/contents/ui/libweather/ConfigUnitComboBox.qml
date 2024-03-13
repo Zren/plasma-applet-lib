@@ -1,7 +1,7 @@
-// Version 3
+// Version 4
 
-import QtQuick 2.0
-import QtQuick.Controls 2.0 as QQC2
+import QtQuick
+import QtQuick.Controls as QQC2
 
 QQC2.ComboBox {
 	property string configKey

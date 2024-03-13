@@ -1,4 +1,4 @@
-// Version 2
+// Version 3
 // Based On: https://invent.kde.org/plasma/kdeplasma-addons/-/blame/master/applets/weather/package/contents/ui/config/WeatherStationPickerDialog.qml
 
 /*
@@ -7,13 +7,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-import QtQuick 2.9
-
-import QtQuick.Window 2.2
-import QtQuick.Controls 2.5 as QQC2
-import QtQuick.Layouts 1.3
-
-import org.kde.kirigami 2.5 as Kirigami
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
 
 
 Window {

@@ -1,13 +1,13 @@
-// Version 9
+// Version 10
 
 // For testing the DataSource, enable the dataengine debug logging with:
 // QT_LOGGING_RULES="kde.dataengine.weather=true" plasmoidviewer ...
 
-import QtQuick 2.0
-import QtQuick.Layouts 1.1
-import org.kde.plasma.core 2.0 as PlasmaCore
+import QtQuick
+import QtQuick.Layouts
+import org.kde.plasma.plasma5support as Plasma5Support
 
-import org.kde.plasma.private.weather 1.0 as WeatherPlugin
+import org.kde.plasma.private.weather as WeatherPlugin
 
 QtObject {
 	// readonly property string weatherSource: 'bbcukmet|weather|City of London, Greater London|2643741'
@@ -58,7 +58,7 @@ QtObject {
 	// onOberservationTimestampChanged: console.log(plasmoid.pluginName, 'oberservationTimestamp', oberservationTimestamp)
 
 
-	property var weatherDataSource: PlasmaCore.DataSource {
+	property var weatherDataSource: Plasma5Support.DataSource {
 		id: weatherDataSource
 		engine: "weather"
 		connectedSources: weatherSource

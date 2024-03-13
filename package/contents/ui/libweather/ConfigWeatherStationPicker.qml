@@ -1,4 +1,4 @@
-// Version 2
+// Version 3
 // Based On: https://invent.kde.org/plasma/kdeplasma-addons/-/blame/master/applets/weather/package/contents/ui/config/ConfigWeatherStation.qml
 
 /*
@@ -8,11 +8,10 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-import QtQuick 2.0
-import QtQuick.Controls 2.0 as QQC2
-import QtQuick.Layouts 1.0
-
-import org.kde.kirigami 2.3 as Kirigami
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
 
 RowLayout {
 	id: configWeatherStationPicker

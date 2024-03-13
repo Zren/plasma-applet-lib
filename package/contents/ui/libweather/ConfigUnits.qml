@@ -1,9 +1,9 @@
-// Version 2
+// Version 3
 
-import QtQuick 2.5
+import QtQuick
+import org.kde.kirigami as Kirigami
 
-import org.kde.kirigami 2.5 as Kirigami
-import org.kde.plasma.private.weather 1.0 as WeatherPlugin
+import org.kde.plasma.private.weather as WeatherPlugin
 
 Kirigami.FormLayout {
 

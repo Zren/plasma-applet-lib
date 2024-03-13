@@ -1,4 +1,4 @@
-// Version 4
+// Version 5
 // Based On: https://invent.kde.org/plasma/kdeplasma-addons/-/blame/master/applets/weather/package/contents/ui/config/WeatherStationPicker.qml
 
 /*
@@ -8,15 +8,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-import QtQuick 2.9
+import QtQuick
 
-import QtQuick.Controls 2.5 as QQC2
-import QtQuick.Layouts 1.3
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
+import org.kde.plasma.plasma5support as Plasma5Support
 
-import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.kirigami 2.8 as Kirigami
-
-import org.kde.plasma.private.weather 1.0 as WeatherPlugin
+import org.kde.plasma.private.weather as WeatherPlugin
 
 
 ColumnLayout {
@@ -25,7 +24,7 @@ ColumnLayout {
 	// Use weather dataengine to list weather providers instead of plasmoid.nativeInterface.providers
 	property alias providers: weatherDataSource.ionServiceList
 	readonly property bool hasProviders: providers.length > 0
-	property var weatherDataSource: PlasmaCore.DataSource {
+	property var weatherDataSource: Plasma5Support.DataSource {
 		id: weatherDataSource
 		engine: "weather"
 		connectedSources: ['ions']
