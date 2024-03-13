@@ -1,9 +1,9 @@
-// Version 6
+// Version 7
 
-import QtQuick 2.0
-import QtQuick.Controls 2.0 as QQC2
-import QtQuick.Dialogs 1.3
-import QtQuick.Layouts 1.0
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Dialogs
+import QtQuick.Layouts
 
 import "." as LibConfig
 
