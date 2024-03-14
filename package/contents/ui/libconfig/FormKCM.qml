@@ -1,4 +1,4 @@
-// Version 2
+// Version 3
 
 import QtQuick
 import QtQuick.Window
@@ -24,7 +24,7 @@ KCM.SimpleKCM {
 	Window.onWindowChanged: {
 		if (Window.window) {
 			Window.window.visibleChanged.connect(function(){
-				if (Window.window.visible && Window.window.width < wideModeMinWidth) {
+				if (Window.window && Window.window.visible && Window.window.width < wideModeMinWidth) {
 					Window.window.width = wideModeMinWidth
 				}
 			})
