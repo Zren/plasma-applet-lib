@@ -1,24 +1,15 @@
-import QtQuick 2.0
-import QtQuick.Controls 2.5 as QQC2
-import QtQuick.Layouts 1.0
-import QtQuick.Window 2.9
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
+import QtQuick.Window
 
-import org.kde.kirigami 2.5 as Kirigami
-import org.kde.plasma.core 2.0 as PlasmaCore
+import org.kde.kirigami as Kirigami
+import org.kde.plasma.core as PlasmaCore
 
 import "../libconfig" as LibConfig
 
 
-Kirigami.FormLayout {
-
-	Window.onWindowChanged: {
-		if (Window.window) {
-			Window.window.show()
-			Window.window.requestActivate()
-			Window.window.y = 0
-		}
-	}
-
+LibConfig.FormKCM {
 
 	//-------------------------------------------------------
 	LibConfig.Heading {
