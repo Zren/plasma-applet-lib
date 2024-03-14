@@ -1,8 +1,8 @@
-// Version 7
+// Version 8
 
 import QtQuick
 import QtQuick.Controls as QQC2
-import QtQuick.Dialogs
+import QtQuick.Dialogs as QtDialog
 import QtQuick.Layouts
 
 import "." as LibConfig
@@ -51,18 +51,18 @@ RowLayout {
 	Loader {
 		id: dialogLoader
 		active: false
-		sourceComponent: FileDialog {
+		sourceComponent: QtDialog.FileDialog {
 			id: dialog
 			visible: false
 			modality: Qt.WindowModal
 			title: i18n("Choose a sound effect")
-			folder: '/usr/share/sounds'
+			currentFolder: 'file:///usr/share/sounds/'
 			nameFilters: [
 				i18n("Sound files (%1)", "*.wav *.mp3 *.oga *.ogg"),
 				i18n("All files (%1)", "*"),
 			]
 			onAccepted: {
-				sfxPathField.text = fileUrl
+				sfxPathField.text = selectedFile
 				dialogLoader.active = false // visible=false is called before onAccepted
 			}
 			onRejected: {
