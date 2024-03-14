@@ -1,12 +1,12 @@
-// Version 9
+// Version 10
 
-import QtQuick 2.0
-import QtQuick.Controls 2.0 as QQC2
-import QtQuick.Layouts 1.0
-
-import org.kde.kirigami 2.0 as Kirigami
-import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.kquickcontrolsaddons 2.0 as KQuickAddons
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
+import org.kde.ksvg as KSvg
+import org.kde.plasma.core as PlasmaCore
+import org.kde.iconthemes as KIconThemes // IconDialog
 
 RowLayout {
 	id: iconField
@@ -38,14 +38,14 @@ RowLayout {
 
 		onPressed: iconMenu.opened ? iconMenu.close() : iconMenu.open()
 
-		contentItem: PlasmaCore.FrameSvgItem {
+		contentItem: KSvg.FrameSvgItem {
 			id: previewFrame
 			imagePath: plasmoid.location === PlasmaCore.Types.Vertical || plasmoid.location === PlasmaCore.Types.Horizontal
 					? "widgets/panel-background" : "widgets/background"
 			implicitWidth: fixedMargins.left + previewIconSize + fixedMargins.right
 			implicitHeight: fixedMargins.top + previewIconSize + fixedMargins.bottom
 
-			PlasmaCore.IconItem {
+			Kirigami.Icon {
 				anchors.fill: parent
 				anchors.leftMargin: previewFrame.fixedMargins.left
 				anchors.topMargin: previewFrame.fixedMargins.top
@@ -127,7 +127,7 @@ RowLayout {
 	Loader {
 		id: dialogLoader
 		active: false
-		sourceComponent: KQuickAddons.IconDialog {
+		sourceComponent: KIconThemes.IconDialog {
 			id: dialog
 			visible: true
 			modality: Qt.WindowModal
