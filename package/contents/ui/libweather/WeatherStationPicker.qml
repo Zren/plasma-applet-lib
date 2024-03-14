@@ -1,4 +1,4 @@
-// Version 6
+// Version 7
 // Based On: https://invent.kde.org/plasma/kdeplasma-addons/-/blame/master/applets/weather/package/contents/ui/config/WeatherStationPicker.qml
 
 /*
@@ -60,7 +60,7 @@ ColumnLayout {
 
 	WeatherPlugin.LocationListModel {
 		id: locationListModel
-		onLocationSearchDone: {
+		onLocationSearchDone: function(success, searchString) {
 			if (!success) {
 				noSearchResultReport.text = i18ndc("plasma_applet_org.kde.plasma.weather", "@info", "No weather stations found for '%1'", searchString);
 				noSearchResultReport.visible = true;
