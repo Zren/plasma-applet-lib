@@ -1,8 +1,8 @@
-// Version 8
+// Version 9
 
 import QtQuick
 import QtQuick.Controls as QQC2
-import QtQuick.Dialogs as QtDialog
+import QtQuick.Dialogs as QtDialogs
 import QtQuick.Layouts
 
 import "." as LibConfig
@@ -16,6 +16,8 @@ RowLayout {
 	property alias sfxEnabled: sfxEnabledCheckBox.checked
 	property alias sfxPath: sfxPathField.text
 	property alias sfxDefaultPath: sfxPathField.defaultValue
+
+	signal dialogOpen(var dialog)
 
 	// Importing QtMultimedia apparently segfaults both OpenSUSE and Kubuntu.
 	// https://github.com/Zren/plasma-applet-eventcalendar/issues/84
@@ -51,7 +53,7 @@ RowLayout {
 	Loader {
 		id: dialogLoader
 		active: false
-		sourceComponent: QtDialog.FileDialog {
+		sourceComponent: QtDialogs.FileDialog {
 			id: dialog
 			visible: false
 			modality: Qt.WindowModal
@@ -72,7 +74,10 @@ RowLayout {
 			// nameFilters must be set before opening the dialog.
 			// If we create the dialog with visible=true, the nameFilters
 			// will not be set before it opens.
-			Component.onCompleted: visible = true
+			Component.onCompleted: {
+				soundField.dialogOpen(dialog)
+				visible = true
+			}
 		}
 	}
 }
