@@ -1,9 +1,9 @@
 #!/bin/bash
-# Version 20
+# Version 21
 
 qtMinVer="6.6"
 kfMinVer="6.0"
 plasmaMinVer="6.0"
 filenameTag="plasma${plasmaMinVer}"
-filenameTag=`echo "$filenameTag" | sed 's/\./\_/'`
+filenameTag=`echo "$filenameTag" | sed 's/\./\-/'`
 python3 ./kpac build --tag "$filenameTag"
