@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-__version__ = '27'
+__version__ = '28'
 
 #--- User Configurable Defaults
 # You can use `kpac --dir=package --i18ndir=package/translate`
@@ -1502,7 +1502,7 @@ def updateFile(kpackage, libPath, fileRelativePath):
 
 	diffStr = git_diff_color_noindex(fileProjectPath, fileLibPath)
 	if diffStr.strip() != "":
-		echoWarning(f"[kpac-plasma6] Update '{fileRelativePath}'?")
+		echoWarning(f"[kpac-updatelib] Update '{fileRelativePath}'?")
 		print(diffStr)
 		print('')
 		if input('Copy? [y]/n > ') != 'n':
