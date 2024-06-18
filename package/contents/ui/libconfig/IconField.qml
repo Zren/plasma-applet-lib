@@ -1,4 +1,4 @@
-// Version 11
+// Version 12
 
 import QtQuick
 import QtQuick.Controls as QQC2
@@ -39,22 +39,11 @@ RowLayout {
 
 		onPressed: iconMenu.opened ? iconMenu.close() : iconMenu.open()
 
-		contentItem: KSvg.FrameSvgItem {
-			id: previewFrame
-			imagePath: plasmoid.location === PlasmaCore.Types.Vertical || plasmoid.location === PlasmaCore.Types.Horizontal
-					? "widgets/panel-background" : "widgets/background"
-			implicitWidth: fixedMargins.left + previewIconSize + fixedMargins.right
-			implicitHeight: fixedMargins.top + previewIconSize + fixedMargins.bottom
-
-			Kirigami.Icon {
-				anchors.fill: parent
-				anchors.leftMargin: previewFrame.fixedMargins.left
-				anchors.topMargin: previewFrame.fixedMargins.top
-				anchors.rightMargin: previewFrame.fixedMargins.right
-				anchors.bottomMargin: previewFrame.fixedMargins.bottom
-				source: iconField.value || iconField.placeholderValue
-				active: iconButton.hovered
-			}
+		contentItem: Kirigami.Icon {
+			source: iconField.value || iconField.placeholderValue
+			active: iconButton.hovered
+			implicitWidth: previewIconSize
+			implicitHeight: previewIconSize
 		}
 
 		QQC2.Menu {
